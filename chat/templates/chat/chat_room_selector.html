@@ -1,0 +1,13 @@
+{% extends "chat/base.html" %}
+{% block title %}Chat room selector{% endblock %}
+{% block h1 %}Create or select an existing chat room{% endblock %}
+{% block content %}
+    <h2>Join existing room</h2>
+    <ul class="chat-room-list">
+        {% for room in chat_rooms %}
+            <li class="chat-room">
+                <a href="{% url "chat-rooms-page" room.name%}">room.name</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
