@@ -301,6 +301,10 @@ celerybeat-schedule
 # mkdocs documentation
 /site
 
+# Ignore the default SQLite database.
+/db/*.sqlite3
+*.sqlite3
+
 # mypy
 .mypy_cache/
 .dmypy.json
