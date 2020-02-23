@@ -2,6 +2,12 @@
 {% block title %}Chat room selector{% endblock %}
 {% block h1 %}Create or select an existing chat room{% endblock %}
 {% block content %}
+    <h2>Create a new room</h2>
+    <form action="." method="post">
+        {% csrf_token %}
+        {{ room_form }}
+        <input type="submit" value="Create new room">
+    </form>
     <h2>Join existing room</h2>
     <ul class="chat-room-list">
         {% for room in chat_rooms %}
