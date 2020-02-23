@@ -4,14 +4,13 @@ from .models import Room, Comment
 
 
 @admin.register(Room)
-class PostAdmin(admin.ModelAdmin):
-    list_display = ('title')
-    search_fields = ('title')
+class RoomAdmin(admin.ModelAdmin):
+    list_display = ('title',)
+    search_fields = ('title',)
     
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('body', 'room', 'created')
-    list_filter = ('room')
-    search_fields = ('body')
-# Register your models here.
+    list_filter = ('room',)
+    search_fields = ('body',)
