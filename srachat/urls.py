@@ -19,5 +19,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     #Temporarilly, untill we create models and views in App 'chat'
-    #path('chat/', include('chat.urls')),
+    #path('', include('chat.urls')),
 ]
