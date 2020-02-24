@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Room, Comment
+from srachat.chat.models import Room, Comment
 
 
 @admin.register(Room)
