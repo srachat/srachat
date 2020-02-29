@@ -12,7 +12,7 @@
     <ul class="chat-room-list">
         {% for room in chat_rooms %}
             <li class="chat-room">
-                <a href="{% url "chat-rooms-page" room.name%}">room.name</a>
+                <a href="/{{ room.title }}">{{ room.title }}</a>
             </li>
         {% endfor %}
     </ul>
