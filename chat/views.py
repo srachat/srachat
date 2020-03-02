@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
-from .forms import RoomForm
-from .models import Room
+from chat.forms import RoomForm
+from chat.models import Room
 
 
 def chat_rooms(request):
