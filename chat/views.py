@@ -9,8 +9,7 @@ def chat_rooms(request):
         room_form = RoomForm(request.POST)
         if room_form.is_valid():
             room_form.save()
-    else:
-        room_form = RoomForm()
+    room_form = RoomForm()
     rooms = Room.objects.all()
     return render(
         request, "chat/chat_room_selector.html",
