@@ -28,7 +28,7 @@ def single_chat_room(request, room_id):
         comment.room = current_room
         comment.save()
     comment_form = CommentForm()
-    current_room_comments = Comment.objects.filter(room = current_room)
+    current_room_comments = Comment.objects.filter(room=current_room)
     return render(
         request, "chat/single_chat_room.html",
         {
