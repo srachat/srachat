@@ -1,0 +1,17 @@
+{% extends "chat/base.html" %}
+{% block title %}{{ room_id }}{% endblock %}
+{% block h1 %}Fuck you bitch!{% endblock %}
+{% block content %}
+    <form action="." method="post">
+        {% csrf_token %}
+        {{ comment_form }}
+        <input type="submit" value="Send">
+    </form>
+    <ul class="comments">
+        {% for comment in comments %}
+            <li class="single-comment">
+                {{ comment.body }} posted on {{ comment.created }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
