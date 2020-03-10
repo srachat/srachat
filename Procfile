@@ -1,0 +1,1 @@
+web: daphne srachat.asgi:application
