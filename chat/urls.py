@@ -1,8 +1,14 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
-from chat import views
+from chat.views import comments, rooms
+
+router = DefaultRouter()
+router.register(r'comments', comments.CommentViewSet)
+router.register(r'rooms', rooms.RoomViewSet)
 
 urlpatterns = [
-    path('', views.chat_rooms, name="chat-rooms-page"),
-    path('<str:room_id>/', views.single_chat_room, name="single-chat-room"),
+    path('', include(router.urls)),
 ]
+
+
