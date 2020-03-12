@@ -1,3 +1,6 @@
 django
 channels
 channels_redis
+daphne
+django-heroku
+dj-database-url
