@@ -15,8 +15,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
+from rest_framework.schemas import get_schema_view
+
+SCHEMA_NAME = "pidorapi-schema"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('pidor/', include('chat.urls'))  # route to api calls
+    path('pidor/', include('chat.urls')),  # route to api calls
+    # Use the `get_schema_view()` helper to add a `SchemaView` to project URLs.
+    #   * `title` and `description` parameters are passed to `SchemaGenerator`.
+    #   * Provide view name for use with `reverse()`.
+    path('pidorapi/', get_schema_view(
+        title="Your Project",
+        description="API for all things … and pidors",
+        version="1.0.0"
+    ), name=SCHEMA_NAME),
+    # Route TemplateView to serve Swagger UI template.
+    #   * Provide `extra_context` with view name of `SchemaView`.
+    path('swagger/', TemplateView.as_view(
+        template_name='swagger.html',
+        extra_context={'schema_url': SCHEMA_NAME}
+    ), name='swagger'),
 ]

@@ -5,3 +5,5 @@ dj-database-url
 django
 django-heroku
 djangorestframework
+pyyaml
+uritemplate
