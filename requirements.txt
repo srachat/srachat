@@ -1,4 +1,7 @@
-django
 channels
 channels_redis
+daphne
+dj-database-url
+django
+django-heroku
 djangorestframework
