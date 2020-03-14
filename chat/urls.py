@@ -1,14 +1,12 @@
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
 from chat.views import comments, rooms
 
-router = DefaultRouter()
-router.register(r'comments', comments.CommentViewSet)
-router.register(r'rooms', rooms.RoomViewSet)
-
 urlpatterns = [
-    path('', include(router.urls)),
+    path('rooms/', rooms.RoomList.as_view()),
+    path('rooms/<int:pk>/', rooms.RoomDetail.as_view()),
+    path('rooms/<int:pk>/comments/', comments.CommentList.as_view()),
+    path('rooms/<int:room_pk>/comments/<int:comment_pk>/', comments.CommentDetail.as_view()),
 ]
 
 
