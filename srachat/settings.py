@@ -44,15 +44,29 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Django internal applications
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # 3rd party applications
+    'allauth',
+    'allauth.account',
+    'rest_auth',
+    'rest_auth.registration',
     'rest_framework',
+    'rest_framework.authtoken',
+
+    # Internal applications
     'chat',
 ]
+
+# Next setup is required for django-rest-auth registration module
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -129,3 +143,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
+
+# Rest framework auth backend
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
+
+# Django email backend
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
