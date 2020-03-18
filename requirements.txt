@@ -7,3 +7,4 @@ django-heroku
 djangorestframework
 pyyaml
 uritemplate
+django-rest-auth[with_social]
