@@ -1,6 +1,10 @@
-django
 channels
 channels_redis
 daphne
-django-heroku
 dj-database-url
+django
+django-heroku
+djangorestframework
+pyyaml
+uritemplate
+django-rest-auth[with_social]
