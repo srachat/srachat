@@ -5,6 +5,7 @@ dj-database-url
 django
 django-heroku
 djangorestframework
+django-cors-headers
 pyyaml
 uritemplate
 django-rest-auth[with_social]
