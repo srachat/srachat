@@ -15,9 +15,3 @@ class ChatUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatUser
         fields = '__all__'
-
-
-class SingleRoomChatUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ChatUser
-        fields = ('id',)
