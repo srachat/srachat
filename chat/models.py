@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 
 class Room(models.Model):
     title = models.CharField(max_length=250, unique=True)
+    creator = models.ForeignKey("ChatUser", null=True, on_delete=models.CASCADE, related_name="created_room")
 
     @staticmethod
     def get_room_or_404(pk):
