@@ -35,7 +35,8 @@ class Comment(models.Model):
 
 
 class ChatUser(models.Model):
-    rooms = models.ManyToManyField(Room, related_name='chat_users')
+    image = models.ImageField(upload_to='images', null=True, blank=True)
+    rooms = models.ManyToManyField(Room, blank=True, related_name='chat_users')
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     @staticmethod
