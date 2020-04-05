@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, parsers
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,6 +21,7 @@ class ChatUserDetail(generics.RetrieveUpdateDestroyAPIView):
     This view is able to display all existing rooms
     or to create a new one.
     """
+    parser_classes = [parsers.MultiPartParser]
     queryset = ChatUser.objects.all()
     serializer_class = ChatUserSerializer
 
