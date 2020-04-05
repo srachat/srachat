@@ -141,7 +141,7 @@ STATIC_URL = '/static/'
 # Information about the location static files (for the future)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# Media files (CSS, JavaScript)
+# Media files
 MEDIA_URL = '/media/'
 
 # Information about the location media files
