@@ -133,13 +133,19 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
 
 # Information about the location static files (for the future)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# Media files (CSS, JavaScript)
+MEDIA_URL = '/media/'
+
+# Information about the location media files
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
