@@ -35,8 +35,9 @@ class Comment(models.Model):
 
 
 class ChatUser(models.Model):
-    rooms = models.ManyToManyField(Room, related_name='chat_users')
+    rooms = models.ManyToManyField(Room, related_name='chat_users', blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='images', null=True, blank=True)
 
     @staticmethod
     def get_chat_user_or_404(pk):

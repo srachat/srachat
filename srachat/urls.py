@@ -13,10 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from rest_framework.schemas import get_schema_view
+
+from srachat import settings
 
 SCHEMA_NAME = "pidorapi-schema"
 
@@ -38,3 +41,7 @@ urlpatterns = [
         extra_context={'schema_url': SCHEMA_NAME}
     ), name='swagger'),
 ]
+
+#For serving media files in development mode.
+if settings.DEBUG:
+  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
