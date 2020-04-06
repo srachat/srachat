@@ -6,8 +6,8 @@ from django.shortcuts import get_object_or_404
 
 
 class Room(models.Model):
-    title = models.CharField(max_length=250, unique=True)
     creator = models.ForeignKey("ChatUser", null=True, on_delete=models.CASCADE, related_name="created_room")
+    title = models.CharField(max_length=250, unique=True)
 
     @staticmethod
     def get_room_or_404(pk):
@@ -18,9 +18,10 @@ class Room(models.Model):
 
 
 class Comment(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='comments')
     body = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
+    creator = models.ForeignKey("ChatUser", null=True, on_delete=models.CASCADE, related_name="created_comment")
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='comments')
 
     class Meta:
         ordering = ('created',)
@@ -34,8 +35,8 @@ class Comment(models.Model):
 
 
 class ChatUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
     rooms = models.ManyToManyField(Room, related_name='chat_users', blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images', null=True, blank=True)
 
     @staticmethod
