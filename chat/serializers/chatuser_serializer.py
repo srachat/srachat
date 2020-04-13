@@ -1,16 +1,13 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 from chat.models import ChatUser
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("last_login", "username", "first_name", "last_name", "date_joined")
-
-
 class ChatUserSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    last_login = serializers.CharField(source='user.last_login')
+    username = serializers.CharField(source='user.username')
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    date_joined = serializers.CharField(source='user.date_joined')
 
     class Meta:
         model = ChatUser
