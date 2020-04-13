@@ -1,28 +1,28 @@
 from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from chat.models import Comment, Room, ChatUser
-from chat.permissions import IsCreatorOrReadOnly
+from chat.permissions import IsCreatorOrReadOnly, IsRoomParticipantOrReadOnly
 from chat.serializers.comment_serializer import SingleRoomCommentSerializer
 
 
-class CommentList(APIView):
+class CommentList(generics.GenericAPIView):
     """
     This view is able to display or add comments in all chat rooms
     or if the room id is given to display or add comments to the given room.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly & IsRoomParticipantOrReadOnly]
+    queryset = Room.objects.all()
 
     def get(self, request, pk, format=None):
-        room = Room.get_room_or_404(pk)
+        room = self.get_object()
         comments = Comment.objects.filter(room=room)
         serializer = SingleRoomCommentSerializer(comments, many=True)
         return Response(serializer.data)
 
     def post(self, request, pk, format=None):
-        room = Room.get_room_or_404(pk)
+        room = self.get_object()
         serializer = SingleRoomCommentSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(room=room, creator=ChatUser.objects.get(user=request.user))

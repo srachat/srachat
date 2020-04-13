@@ -39,12 +39,12 @@ class RoomUserList(APIView):
         chat_user = ChatUser.objects.get(user=request.user)
         chat_users_amount = ChatUser.objects.filter(rooms=pk).count()
         chat_user_rooms_amount = Room.objects.filter(chat_users=chat_user).count()
-        if chat_users_amount > 0:
+        if chat_users_amount > 100:
             return Response(
                 "Your reached the limit of users for this room.",
                 status=status.HTTP_426_UPGRADE_REQUIRED
             )
-        if chat_user_rooms_amount > 0:
+        if chat_user_rooms_amount > 100:
             return Response(
                 "Your reached the limit of rooms for your user. Consider upgrading to better type.",
                 status=status.HTTP_426_UPGRADE_REQUIRED
