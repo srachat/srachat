@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from chat.models import ChatUser, Room
+from chat.permissions import IsAccountOwnerOrReadOnly
 from chat.serializers.chatuser_serializer import ChatUserSerializer
 
 
@@ -21,6 +22,7 @@ class ChatUserDetail(generics.RetrieveUpdateDestroyAPIView):
     This view is able to display all existing rooms
     or to create a new one.
     """
+    permission_classes = [IsAuthenticatedOrReadOnly & IsAccountOwnerOrReadOnly]
     parser_classes = [parsers.MultiPartParser]
     queryset = ChatUser.objects.all()
     serializer_class = ChatUserSerializer

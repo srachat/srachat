@@ -30,3 +30,17 @@ class IsRoomParticipantOrReadOnly(permissions.BasePermission):
             return True
 
         return ChatUser.objects.get(user=request.user) in obj.chat_users.all()
+
+
+class IsAccountOwnerOrReadOnly(permissions.BasePermission):
+    """
+    Custom permission to only account owner can change some info about themselves
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return obj.user == request.user
