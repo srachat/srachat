@@ -147,8 +147,9 @@ MEDIA_URL = '/media/'
 # Information about the location media files
 MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_URL)
 
-# Activate Django-Heroku.
-django_heroku.settings(locals())
+if "IS_HEROKU" in os.environ:
+    # Activate Django-Heroku.
+    django_heroku.settings(locals())
 
 # Rest framework auth backend
 REST_FRAMEWORK = {
