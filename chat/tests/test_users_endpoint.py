@@ -131,6 +131,8 @@ class UsersTest(APITestCase):
         self.assertEqual(data["image"], None)
         self.assertEqual(data["rooms"], [])
 
+    # TODO: add tests to test whether another user can change user info
+
     def test_update_user_info_not_authenticated(self):
         """
             PATCH: '/pidor/users/{id}/'
