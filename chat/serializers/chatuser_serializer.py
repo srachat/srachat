@@ -3,10 +3,11 @@ from chat.models import ChatUser
 
 
 class ChatUserSerializer(serializers.ModelSerializer):
-    last_login = serializers.CharField(source='user.last_login', read_only=True)
     username = serializers.CharField(source='user.username')
+    email = serializers.CharField(source='user.email')
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
+    last_login = serializers.CharField(source='user.last_login', read_only=True)
     date_joined = serializers.CharField(source='user.date_joined', read_only=True)
 
     def update(self, instance, validated_data):
