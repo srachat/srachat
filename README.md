@@ -23,6 +23,6 @@ the install. Some information you can find it here: https://docs.docker.com/dock
 More information: https://docs.docker.com/docker-for-windows/.
 4) Clone the repo to some place at your local file storage
 5) Navigate to the created project: `cd srachat`
-6) If you startup Docker for our project for the first time. You have to rebuild Docker Compose by typing `docker-compose build`. Next 
-step is the startup it by `docker-compose up`.
+6) If you startup Docker for our project for the first time. You have to rebuild Docker Compose by typing `docker-compose build`. 
+Next step is the startup it by `docker-compose up`.
 7) Write to the browser's address bar localhost:8000/pidor/rooms/ and you can use it.
