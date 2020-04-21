@@ -3,9 +3,13 @@ import datetime
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, force_authenticate
+from rest_framework.test import APITestCase
 
 from chat.models import ChatUser
+
+"""
+    TODO: add test cases description
+"""
 
 USERNAME = "user_name_"
 USERNAME_FIRST = USERNAME + "1"
@@ -65,8 +69,8 @@ class UsersTest(APITestCase):
         self.auth_token = response.data["key"]
 
     def test_check_registration_data_correctness(self):
-        self.assertTrue(ChatUser.objects.get().user.username, USERNAME_FIRST)
-        self.assertTrue(ChatUser.objects.get().user.email, EMAIL_FIRST)
+        self.assertEqual(ChatUser.objects.get().user.username, USERNAME_FIRST)
+        self.assertEqual(ChatUser.objects.get().user.email, EMAIL_FIRST)
 
     def test_user_list_endpoint(self):
         """
@@ -93,8 +97,11 @@ class UsersTest(APITestCase):
         """
         url = reverse(URL_LIST)
 
-        response = self.client.post(url, DATA_THIRD, format="json")
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        post_response = self.client.post(url, DATA_THIRD, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        get_response = self.client.get(url)
+        self.assertEqual(len(get_response.data), 1)
 
     def test_only_safe_methods_allowed(self):
         """
@@ -141,11 +148,14 @@ class UsersTest(APITestCase):
 
         url = reverse(URL_DETAILS, args=[1])
 
-        response = self.client.patch(
+        patch_response = self.client.patch(
             path=url,
             data={"username": updated_username}
         )
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(patch_response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        get_response = self.client.get(url)
+        self.assertNotEqual(get_response.data["username"], updated_username)
 
     def test_update_user_info_authenticated(self):
         """
@@ -171,9 +181,12 @@ class UsersTest(APITestCase):
         """
 
         url = reverse(URL_DETAILS, args=[1])
-        response = self.client.delete(url)
 
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        delete_response = self.client.delete(url)
+        self.assertEqual(delete_response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        get_response = self.client.get(url)
+        self.assertNotEqual(get_response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_user_authenticated(self):
         """
