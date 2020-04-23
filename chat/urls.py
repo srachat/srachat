@@ -14,9 +14,9 @@ urlpatterns = [
     path('comments/<int:pk>/', comments.CommentDetail.as_view()),
 
     # User endpoints
-    path('rooms/<int:pk>/users/', chatusers.RoomUserList.as_view()),
-    path('users/', chatusers.ChatUserList.as_view()),
-    path('users/<int:pk>/', chatusers.ChatUserDetail.as_view()),
+    path('rooms/<int:pk>/users/', chatusers.RoomUserList.as_view(), name="list_room_users"),
+    path('users/', chatusers.ChatUserList.as_view(), name="list_users"),
+    path('users/<int:pk>/', chatusers.ChatUserDetail.as_view(), name="user_details"),
 
 
     # Rest auth endpoints

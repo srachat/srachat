@@ -8,7 +8,7 @@ from chat.permissions import IsAccountOwnerOrReadOnly
 from chat.serializers.chatuser_serializer import ChatUserSerializer
 
 
-class ChatUserList(generics.ListCreateAPIView):
+class ChatUserList(generics.ListAPIView):
     """
     This view is able to display all existing rooms
     or to create a new one.
