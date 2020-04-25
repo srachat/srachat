@@ -107,3 +107,23 @@ class RoomsTest(APITestCase):
         get_response = self.client.get(url)
         self.assertEqual(get_response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(get_response.data), 0)
+
+    def test_get_room_info(self):
+        """
+            GET: '/pidor/rooms/{id}/'
+        """
+
+        url = reverse(URL_LIST)
+        url_info = reverse(URL_DETAILS, args=[1])
+
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token)
+        post_response = self.client.post(url, data=DATA_ROOM_FIRST, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+
+        get_response = self.client.get(url_info)
+        keys = ["title", "creator"]
+        self.assertTrue(all([key in get_response.data.keys() for key in keys]))
+
+        data = get_response.data
+        self.assertEqual(data["title"], ROOMNAME_FIRST)
+        self.assertEqual(data["creator"], USERNAME_FIRST)
