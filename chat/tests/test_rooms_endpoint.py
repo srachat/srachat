@@ -57,7 +57,7 @@ class RoomsTest(APITestCase):
         response = self.client.post(url, data=DATA_USER_FIRST, format="json")
         self.auth_token = response.data["key"]
 
-    def test_room_creation(self):
+    def test_room_creation_authenticated(self):
         """
             POST: '/pidor/rooms/'
         """
@@ -79,7 +79,7 @@ class RoomsTest(APITestCase):
         post_response = self.client.post(url, data=DATA_ROOM_FIRST, format="json")
         self.assertEqual(post_response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_room_list(self):
+    def test_room_list_authenticated(self):
         """
             GET: '/pidor/rooms/'
         """
@@ -127,3 +127,46 @@ class RoomsTest(APITestCase):
         data = get_response.data
         self.assertEqual(data["title"], ROOMNAME_FIRST)
         self.assertEqual(data["creator"], 1)
+
+    def test_update_room_info_authenticated(self):
+        """
+            PATCH: '/pidor/rooms/{id}/'
+        """
+        updated_title = "updated_title"
+
+        url = reverse(URL_LIST)
+        url_info = reverse(URL_DETAILS, args=[1])
+
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token)
+        post_response = self.client.post(url, data=DATA_ROOM_FIRST, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+
+        patch_response = self.client.patch(
+            path=url_info,
+            data={"title": updated_title}
+        )
+        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
+
+        get_response = self.client.get(url_info)
+        self.assertEqual(get_response.data["title"], updated_title)
+
+    '''
+        TODO: add test update room info without ath
+    '''
+
+    def test_delete_room_info_authenticated(self):
+        """
+            DELETE: '/pidor/rooms/{id}/'
+        """
+        url = reverse(URL_LIST)
+        url_info = reverse(URL_DETAILS, args=[1])
+
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token)
+        post_response = self.client.post(url, data=DATA_ROOM_FIRST, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+
+        delete_response = self.client.delete(url_info)
+        self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+
+        get_response = self.client.get(url_info)
+        self.assertEqual(get_response.status_code, status.HTTP_404_NOT_FOUND)
