@@ -126,4 +126,4 @@ class RoomsTest(APITestCase):
 
         data = get_response.data
         self.assertEqual(data["title"], ROOMNAME_FIRST)
-        self.assertEqual(data["title"], 1)
+        self.assertEqual(data["creator"], 1)
