@@ -105,5 +105,5 @@ class RoomsTest(APITestCase):
         self.assertEqual(post_response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         get_response = self.client.get(url)
-        self.assertEqual(get_response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(get_response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(get_response.data), 0)
