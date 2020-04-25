@@ -40,11 +40,9 @@ DATA_USER_SECOND = {
 }
 DATA_ROOM_FIRST = {
     "title": ROOMNAME_FIRST,
-    "CREATOR": USERNAME_FIRST
 }
 DATA_ROOM_SECOND = {
     "title": ROOMNAME_SECOND,
-    "CREATOR": USERNAME_SECOND
 }
 
 URL_LIST = "list_rooms"
@@ -59,10 +57,6 @@ class RoomsTest(APITestCase):
         response = self.client.post(url, data=DATA_USER_FIRST, format="json")
         self.auth_token = response.data["key"]
 
-    def test_check_registration_data_correctness(self):
-        self.assertEqual(ChatUser.objects.get().user.username, USERNAME_FIRST)
-        self.assertEqual(ChatUser.objects.get().user.email, EMAIL_FIRST)
-
     def test_room_creation(self):
         """
             POST: '/pidor/rooms/'
@@ -70,9 +64,20 @@ class RoomsTest(APITestCase):
 
         url = reverse(URL_LIST)
 
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token)
         post_response = self.client.post(url, data=DATA_ROOM_FIRST, format="json")
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Room.objects.count(), 1)
+
+    def test_room_creation_without_authenticated(self):
+        """
+            POST: '/pidor/rooms/'
+        """
+
+        url = reverse(URL_LIST)
+
+        post_response = self.client.post(url, data=DATA_ROOM_FIRST, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_room_list(self):
         """
@@ -81,6 +86,24 @@ class RoomsTest(APITestCase):
 
         url = reverse(URL_LIST)
 
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token)
+        post_response = self.client.post(url, data=DATA_ROOM_FIRST, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+
+        get_response = self.client.get(url)
+        self.assertEqual(get_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(get_response.data), 1)
+
+    def test_room_list_without_authenticated(self):
+        """
+            GET: '/pidor/rooms/'
+        """
+
+        url = reverse(URL_LIST)
+
+        post_response = self.client.post(url, data=DATA_ROOM_FIRST, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        get_response = self.client.get(url)
+        self.assertEqual(get_response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(len(get_response.data), 0)
