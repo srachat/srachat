@@ -157,7 +157,7 @@ class RoomsTest(APITestCase):
             path=url_info,
             data={"title": updated_title}
         )
-        self.assertEqual(patch_response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(patch_response.status_code, status.HTTP_403_FORBIDDEN)
 
         get_response = self.client.get(url_info)
         self.assertEqual(get_response.data["title"], ROOMNAME_FIRST)
@@ -170,7 +170,7 @@ class RoomsTest(APITestCase):
         url_info = reverse(URL_DETAILS, args=[1])
 
         delete_response = self.client.delete(url_info)
-        self.assertEqual(delete_response.status_code, status.HTTP)
+        self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
 
         get_response = self.client.get(url_info)
         self.assertEqual(get_response.status_code, status.HTTP_404_NOT_FOUND)
@@ -185,7 +185,7 @@ class RoomsTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token_second)
 
         delete_response = self.client.delete(url_info)
-        self.assertEqual(delete_response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(delete_response.status_code, status.HTTP_403_FORBIDDEN)
 
         get_response = self.client.get(url_info)
         keys = ["title", "creator"]
