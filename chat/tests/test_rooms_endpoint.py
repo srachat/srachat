@@ -143,9 +143,24 @@ class RoomsTest(APITestCase):
         get_response = self.client.get(url_info)
         self.assertEqual(get_response.data["title"], updated_title)
 
-    '''
-        TODO: add test update room info by other user
-    '''
+    def test_update_room_info_by_other_user(self):
+        """
+            PATCH: '/pidor/rooms/{id}/'
+        """
+        updated_title = "updated_title"
+
+        url_info = reverse(URL_DETAILS, args=[1])
+
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token_second)
+
+        patch_response = self.client.patch(
+            path=url_info,
+            data={"title": updated_title}
+        )
+        self.assertEqual(patch_response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        get_response = self.client.get(url_info)
+        self.assertEqual(get_response.data["title"], ROOMNAME_FIRST)
 
     def test_delete_room_info_by_creator(self):
         """
@@ -155,11 +170,27 @@ class RoomsTest(APITestCase):
         url_info = reverse(URL_DETAILS, args=[1])
 
         delete_response = self.client.delete(url_info)
-        self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(delete_response.status_code, status.HTTP)
 
         get_response = self.client.get(url_info)
         self.assertEqual(get_response.status_code, status.HTTP_404_NOT_FOUND)
 
-    '''
-        TODO: add test delete room info by other user
-    '''
+    def test_delete_room_info_by_other_user(self):
+        """
+            DELETE: '/pidor/rooms/{id}/'
+        """
+
+        url_info = reverse(URL_DETAILS, args=[1])
+
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token_second)
+
+        delete_response = self.client.delete(url_info)
+        self.assertEqual(delete_response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        get_response = self.client.get(url_info)
+        keys = ["title", "creator"]
+        self.assertTrue(all([key in get_response.data.keys() for key in keys]))
+
+        data = get_response.data
+        self.assertEqual(data["title"], ROOMNAME_FIRST)
+        self.assertEqual(data["creator"], 1)
