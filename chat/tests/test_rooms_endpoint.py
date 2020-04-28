@@ -111,6 +111,20 @@ class RoomsTest(APITestCase):
         self.assertEqual(get_response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(get_response.data), 1)
 
+    def test_only_safe_methods_allowed(self):
+        """
+             DELETE, PATCH, PUT: '/pidor/rooms/
+        """
+
+        url = reverse(URL_LIST)
+
+        delete_response = self.client.delete(url)
+        patch_response = self.client.patch(url)
+        put_response = self.client.put(url)
+        self.assertEqual(delete_response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(patch_response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(put_response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def test_get_room_info(self):
         """
             GET: '/pidor/rooms/{id}/'
@@ -125,6 +139,16 @@ class RoomsTest(APITestCase):
         data = get_response.data
         self.assertEqual(data["title"], ROOMNAME_FIRST)
         self.assertEqual(data["creator"], 1)
+
+    def test_post_room_info(self):
+        """
+            POST: '/pidor/rooms/{id}/'
+        """
+
+        url_info = reverse(URL_DETAILS, args=[1])
+
+        post_response = self.client.post(url_info)
+        self.assertEqual(post_response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_update_room_info_by_creator(self):
         """
