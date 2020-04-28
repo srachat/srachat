@@ -111,6 +111,12 @@ class RoomsTest(APITestCase):
         self.assertEqual(get_response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(get_response.data), 1)
 
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token_second)
+
+        post_response = self.client.post(url, data=DATA_ROOM_SECOND, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Room.objects.count(), 2)
+
     def test_only_safe_methods_allowed(self):
         """
              DELETE, PATCH, PUT: '/pidor/rooms/
