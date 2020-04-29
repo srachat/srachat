@@ -6,8 +6,8 @@ urlpatterns = [
     # Chat endpoints
 
     # Room endpoints
-    path('rooms/', rooms.RoomList.as_view()),
-    path('rooms/<int:pk>/', rooms.RoomDetail.as_view()),
+    path('rooms/', rooms.RoomList.as_view(), name="list_rooms"),
+    path('rooms/<int:pk>/', rooms.RoomDetail.as_view(), name="room_details"),
 
     # Comment endpoints
     path('rooms/<int:pk>/comments/', comments.CommentList.as_view()),
