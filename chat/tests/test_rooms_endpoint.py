@@ -8,7 +8,13 @@ from rest_framework.test import APITestCase
 from chat.models import ChatUser, Room
 
 """
-    TODO: add test cases description
+    RoomCreationTest - POST: '/pidor/rooms/' - test of creation room by authenticated/unauthenticated user
+    RoomTest - GET: '/pidor/rooms/' - test of getting room list
+    RoomTest - PATCH, PUT, DELETE: '/pidor/rooms/' - testing only safe methods allowed     
+    RoomTest - GET: '/pidor/rooms/{id}' - test of getting correct room info
+    RoomTest - PATCH: '/pidor/rooms/{id}/' test of update room info by creator room/ other user
+    RoomTest - DELETE: '/pidor/rooms/{id}/' test of delete room info by creator room/ other user
+    
 """
 
 USERNAME = "user_name_"
