@@ -42,6 +42,13 @@ class UserUtils:
 
 
 @dataclass
+class CommentUtils:
+    DATA_COMMENT_FIRST = {
+        "body": "this is comment"
+    }
+
+
+@dataclass
 class RoomUtils:
     ROOM_NAME = "room_name_"
     ROOM_NAME_FIRST = ROOM_NAME + "1"
@@ -55,7 +62,6 @@ class RoomUtils:
     }
 
 
-@dataclass
 class UrlUtils:
     @dataclass
     class Users:
@@ -65,8 +71,14 @@ class UrlUtils:
 
     @dataclass
     class Rooms:
+        COMMENTS = "room_comments"
         DETAILS = "room_details"
         LIST = "list_rooms"
+        USERS = "list_room_users"
+
+    @dataclass
+    class Comments:
+        DETAILS = "comment_details"
 
 
 class SrachatTestCase(APITestCase):
@@ -89,3 +101,13 @@ class SrachatTestCase(APITestCase):
 
     def set_credentials(self, token: str):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+    def create_comment_get_response(self, room_id: int) -> Response:
+        url = reverse(UrlUtils.Rooms.COMMENTS, args=[room_id])
+        return self.client.post(url, data=CommentUtils.DATA_COMMENT_FIRST)
+
+    def create_and_assert_comment_get_response(self, room_id: int) -> Response:
+        response = self.create_comment_get_response(room_id)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        return response
