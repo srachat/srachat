@@ -3,88 +3,47 @@ import datetime
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 from chat.models import ChatUser
+from chat.tests.utils import UserUtils, UrlUtils, SrachatTestCase
 
 """
     TODO: add test cases description
 """
 
-USERNAME = "user_name_"
-USERNAME_FIRST = USERNAME + "1"
-USERNAME_SECOND = USERNAME + "2"
-USERNAME_THIRD = USERNAME + "3"
 
-EMAIL = "email1@email.com"
-EMAIL_FIRST = EMAIL + "1"
-EMAIL_SECOND = EMAIL + "2"
-EMAIL_THIRD = EMAIL + "3"
-
-PASSWORD = "ez3}yh^L4%27Dnn]"
-
-DATA_FIRST = {
-    "username": USERNAME_FIRST,
-    "email": EMAIL_FIRST,
-    "password1": PASSWORD,
-    "password2": PASSWORD
-}
-DATA_SECOND = {
-    "username": USERNAME_SECOND,
-    "email": EMAIL_SECOND,
-    "password1": PASSWORD,
-    "password2": PASSWORD
-}
-DATA_THIRD = {
-    "username": USERNAME_THIRD,
-    "email": EMAIL_THIRD,
-    "first_name": "first_name",
-    "last_name": "last_name"
-}
-
-URL_LIST = "list_users"
-URL_REGISTER = "rest_register"
-URL_DETAILS = "user_details"
-
-
-class UserCreationTest(APITestCase):
+class UserCreationTest(SrachatTestCase):
     def test_create_account(self):
         """
             POST: '/pidor/rest-auth/registration'
         """
 
-        url = reverse(URL_REGISTER)
-
-        response = self.client.post(url, data=DATA_FIRST, format="json")
+        response = self.register_user_return_response(UserUtils.DATA_FIRST)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(ChatUser.objects.count(), 1)
 
 
-class UsersTest(APITestCase):
+class UsersTest(SrachatTestCase):
     def setUp(self):
-        url = reverse(URL_REGISTER)
-
-        response = self.client.post(url, data=DATA_FIRST, format="json")
-        self.auth_token = response.data["key"]
+        self.auth_token = self.register_user_return_token(UserUtils.DATA_FIRST)
 
     def test_check_registration_data_correctness(self):
-        self.assertEqual(ChatUser.objects.get().user.username, USERNAME_FIRST)
-        self.assertEqual(ChatUser.objects.get().user.email, EMAIL_FIRST)
+        self.assertEqual(ChatUser.objects.get().user.username, UserUtils.USERNAME_FIRST)
+        self.assertEqual(ChatUser.objects.get().user.email, UserUtils.EMAIL_FIRST)
 
     def test_user_list_endpoint(self):
         """
             GET: '/pidor/users/'
         """
 
-        url_list = reverse(URL_LIST)
-        url_register = reverse(URL_REGISTER)
+        url_list = reverse(UrlUtils.Users.LIST)
 
         list_response = self.client.get(url_list)
         self.assertEqual(list_response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(list_response.data), 1)
 
-        post_response = self.client.post(url_register, data=DATA_SECOND, format="json")
+        post_response = self.register_user_return_response(UserUtils.DATA_SECOND)
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
 
         response = self.client.get(url_list)
@@ -95,9 +54,9 @@ class UsersTest(APITestCase):
         """
             POST: '/pidor/users/'
         """
-        url = reverse(URL_LIST)
+        url = reverse(UrlUtils.Users.LIST)
 
-        post_response = self.client.post(url, DATA_THIRD, format="json")
+        post_response = self.client.post(url, UserUtils.DATA_THIRD, format="json")
         self.assertEqual(post_response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         get_response = self.client.get(url)
@@ -108,29 +67,24 @@ class UsersTest(APITestCase):
              DELETE, PATCH, PUT: '/pidor/users/'
         """
 
-        url = reverse(URL_LIST)
+        url = reverse(UrlUtils.Users.LIST)
 
-        response_delete = self.client.delete(url)
-        response_patch = self.client.patch(url)
-        response_put = self.client.put(url)
-        self.assertEqual(response_delete.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-        self.assertEqual(response_patch.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-        self.assertEqual(response_put.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.check_safe_methods(url)
 
     def test_get_user_info(self):
         """
             GET: '/pidor/users/{id}/'
         """
 
-        url = reverse(URL_DETAILS, args=[1])
+        url = reverse(UrlUtils.Users.DETAILS, args=[1])
 
         response = self.client.get(url)
         keys = ["id", "username", "email", "first_name", "last_name", "last_login", "date_joined", "image", "rooms"]
         self.assertTrue(all([key in response.data.keys() for key in keys]))
 
         data = response.data
-        self.assertEqual(data["username"], USERNAME_FIRST)
-        self.assertEqual(data["email"], EMAIL_FIRST)
+        self.assertEqual(data["username"], UserUtils.USERNAME_FIRST)
+        self.assertEqual(data["email"], UserUtils.EMAIL_FIRST)
         self.assertEqual(
             datetime.datetime.fromisoformat(data["date_joined"]).minute,
             datetime.datetime.today().minute
@@ -146,7 +100,7 @@ class UsersTest(APITestCase):
         """
         updated_username = "updated_username"
 
-        url = reverse(URL_DETAILS, args=[1])
+        url = reverse(UrlUtils.Users.DETAILS, args=[1])
 
         patch_response = self.client.patch(
             path=url,
@@ -163,9 +117,9 @@ class UsersTest(APITestCase):
         """
         updated_username = "updated_username"
 
-        url = reverse(URL_DETAILS, args=[1])
+        url = reverse(UrlUtils.Users.DETAILS, args=[1])
 
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token)
+        self.set_credentials(self.auth_token)
         response = self.client.patch(
             path=url,
             data={"username": updated_username}
@@ -180,7 +134,7 @@ class UsersTest(APITestCase):
             DELETE: '/pidor/users/{id}/'
         """
 
-        url = reverse(URL_DETAILS, args=[1])
+        url = reverse(UrlUtils.Users.DETAILS, args=[1])
 
         delete_response = self.client.delete(url)
         self.assertEqual(delete_response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -193,9 +147,9 @@ class UsersTest(APITestCase):
             DELETE: '/pidor/users/{id}/'
         """
 
-        url = reverse(URL_DETAILS, args=[1])
+        url = reverse(UrlUtils.Users.DETAILS, args=[1])
 
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.auth_token)
+        self.set_credentials(self.auth_token)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
