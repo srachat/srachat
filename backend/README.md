@@ -1,5 +1,3 @@
-![Django CI](https://github.com/srachat/srachat/workflows/Django%20CI/badge.svg)
-
 ## How to install and run a backend manually
 
 1) Clone the repo to some place at your local file storage
