@@ -1,3 +1,5 @@
+![Django CI](https://github.com/srachat/srachat/workflows/Django%20CI/badge.svg)
+
 # Project description
 Read projects description here:
 - [Russian](https://docs.google.com/document/d/1ttw4tGS9XrEpi1QZUn63CnIS9gDd0xziDhUGUJTm_5c/edit?usp=sharing)
