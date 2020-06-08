@@ -10,10 +10,10 @@ TODO: add more languages at some point
 For more detailed information about all *ends read `README` in separate folders.
 
 
-# Backend
+### Backend
 Dev stack used in a development:
 - Language used: `Python 3.7` and higher. Lower versions are not supported.
 - Framework used: `Django 3` and higher.
 
-# Frontend
+### Frontend
 TBD
