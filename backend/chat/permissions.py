@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from chat.models import ChatUser
+from .models import ChatUser
 
 
 class IsCreatorOrReadOnly(permissions.BasePermission):

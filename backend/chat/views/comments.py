@@ -2,9 +2,9 @@ from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from chat.models import Comment, Room, ChatUser
-from chat.permissions import IsCreatorOrReadOnly, IsRoomParticipantOrReadOnly
-from chat.serializers.comment_serializer import SingleRoomCommentSerializer
+from ..models import Comment, Room, ChatUser
+from ..permissions import IsCreatorOrReadOnly, IsRoomParticipantOrReadOnly
+from ..serializers.comment_serializer import CommentSerializer, SingleRoomCommentSerializer
 
 
 class CommentList(generics.GenericAPIView):
@@ -14,6 +14,7 @@ class CommentList(generics.GenericAPIView):
     """
     permission_classes = [IsAuthenticatedOrReadOnly & IsRoomParticipantOrReadOnly]
     queryset = Room.objects.all()
+    serializer_class = CommentSerializer
 
     def get(self, request, pk, format=None):
         room = self.get_object()

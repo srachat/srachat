@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 
-from chat.models import ChatUser
-from chat.tests.utils import UserUtils, UrlUtils, SrachatTestCase
+from ..models import ChatUser
+from ..tests.utils import UserUtils, UrlUtils, SrachatTestCase
 
 """
     TODO: add test cases description

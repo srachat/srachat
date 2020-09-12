@@ -2,15 +2,12 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from chat.models import Room, ChatUser
-from chat.permissions import IsCreatorOrReadOnly
-from chat.serializers.room_serializer import RoomSerializer
+from ..models import Room, ChatUser
+from ..permissions import IsCreatorOrReadOnly
+from ..serializers.room_serializer import RoomSerializer
 
 
-class RoomList(
-    generics.CreateAPIView,
-    generics.ListAPIView
-):
+class RoomList(generics.CreateAPIView, generics.ListAPIView):
     """
     This view is able to display all existing rooms
     or to create a new one.
