@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Room, Comment
+from .models.comment import Comment
+from .models.room import Room
 
 
 @admin.register(Room)

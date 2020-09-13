@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ..models import ChatUser
+from ..models.user import ChatUser
 
 
 class ChatUserSerializer(serializers.ModelSerializer):
