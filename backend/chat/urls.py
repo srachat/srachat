@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from chat.views import chatusers, comments, rooms
+from .views import chatusers, comments, rooms
 
 urlpatterns = [
     # Chat endpoints

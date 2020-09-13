@@ -3,9 +3,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from chat.models import ChatUser, Room
-from chat.permissions import IsAccountOwnerOrReadOnly
-from chat.serializers.chatuser_serializer import ChatUserSerializer
+from ..models import ChatUser, Room
+from ..permissions import IsAccountOwnerOrReadOnly
+from ..serializers.chatuser_serializer import ChatUserSerializer
 
 
 class ChatUserList(generics.ListAPIView):

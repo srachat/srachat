@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
 
-from chat.tests.utils import CommentUtils, RoomUtils, UserUtils, UrlUtils, SrachatTestCase
+from ..tests.utils import CommentUtils, RoomUtils, UserUtils, UrlUtils, SrachatTestCase
 
 """
 Setup:

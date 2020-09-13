@@ -1,8 +1,8 @@
 from django.urls import reverse
 from rest_framework import status
 
-from chat.models import Room
-from chat.tests.utils import UserUtils, RoomUtils, UrlUtils, SrachatTestCase
+from ..models import Room
+from ..tests.utils import UserUtils, RoomUtils, UrlUtils, SrachatTestCase
 
 """
     RoomCreationTest - POST: '/pidor/rooms/' - test of creation room by authenticated/unauthenticated user
