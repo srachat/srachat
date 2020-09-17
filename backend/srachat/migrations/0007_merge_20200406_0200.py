@@ -6,8 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chat', '0006_auto_20200406_0007'),
-        ('chat', '0005_comment_creator'),
+        ('srachat', '0006_auto_20200406_0007'),
+        ('srachat', '0005_comment_creator'),
     ]
 
     operations = [

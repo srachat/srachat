@@ -38,7 +38,7 @@ else:
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0']
 
 
 # Application definition
@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     # Internal applications
-    'chat',
+    'srachat',
 ]
 
 # Next setup is required for django-rest-auth registration module
@@ -78,7 +78,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'srachat.urls'
+ROOT_URLCONF = 'root.urls'
 
 TEMPLATES = [
     {
@@ -97,7 +97,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'srachat.wsgi.application'
+WSGI_APPLICATION = 'root.wsgi.application'
 
 
 # Password validation

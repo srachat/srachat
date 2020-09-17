@@ -7,13 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chat', '0004_room_creator'),
+        ('srachat', '0004_room_creator'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='comment',
             name='creator',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='created_comment', to='chat.ChatUser'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='created_comment', to='srachat.ChatUser'),
         ),
     ]

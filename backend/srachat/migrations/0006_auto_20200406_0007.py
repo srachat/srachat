@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chat', '0005_chatuser_image'),
+        ('srachat', '0005_chatuser_image'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='chatuser',
             name='rooms',
-            field=models.ManyToManyField(blank=True, related_name='chat_users', to='chat.Room'),
+            field=models.ManyToManyField(blank=True, related_name='chat_users', to='srachat.Room'),
         ),
     ]
