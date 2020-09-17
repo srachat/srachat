@@ -24,7 +24,7 @@ ROOM_TITLE_1 = "first user room"
 ROOM_TITLE_2 = "second user room"
 
 
-# User and chat user helper functions
+# User and srachat user helper functions
 def create_user(username: str) -> User:
     return User.objects.create_user(username, CHAT_USER_PASSWORD)
 

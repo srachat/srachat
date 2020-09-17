@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('body', models.TextField()),
                 ('created', models.DateTimeField(auto_now_add=True)),
-                ('room', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='chat.Room')),
+                ('room', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='srachat.Room')),
             ],
             options={
                 'ordering': ('created',),
