@@ -1,7 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 
-from ..models import Room
+from ..models.room import Room
 from ..tests.utils import UserUtils, RoomUtils, UrlUtils, SrachatTestCase
 
 """

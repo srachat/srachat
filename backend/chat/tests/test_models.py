@@ -7,7 +7,9 @@ from django.test import TestCase
 from django.utils import timezone
 from sqlite3 import IntegrityError as sq_IntegrityError
 
-from ..models import ChatUser, Comment, Room
+from ..models.comment import Comment
+from ..models.user import ChatUser
+from ..models.room import Room
 
 CHAT_USER_NAME_1 = "first username"
 CHAT_USER_NAME_2 = "second username"

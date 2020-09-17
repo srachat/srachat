@@ -2,7 +2,8 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from ..models import Room, ChatUser
+from ..models.user import ChatUser
+from ..models.room import Room
 from ..permissions import IsCreatorOrReadOnly
 from ..serializers.room_serializer import RoomSerializer
 

@@ -3,7 +3,8 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..models import ChatUser, Room
+from ..models.user import ChatUser
+from ..models.room import Room
 from ..permissions import IsAccountOwnerOrReadOnly
 from ..serializers.chatuser_serializer import ChatUserSerializer
 
