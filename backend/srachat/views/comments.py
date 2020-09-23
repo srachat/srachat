@@ -16,7 +16,7 @@ class CommentList(generics.GenericAPIView):
     """
     permission_classes = [IsAuthenticatedOrReadOnly & IsRoomParticipantOrReadOnly]
     queryset = Room.objects.all()
-    serializer_class = CommentSerializer
+    serializer_class = SingleRoomCommentSerializer
 
     def get(self, request, pk, format=None):
         room = self.get_object()
@@ -38,4 +38,4 @@ class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     permission_classes = [IsAuthenticatedOrReadOnly & IsCreatorOrReadOnly]
     queryset = Comment.objects.all()
-    serializer_class = SingleRoomCommentSerializer
+    serializer_class = CommentSerializer
