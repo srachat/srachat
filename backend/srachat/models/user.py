@@ -14,6 +14,9 @@ class ChatUser(models.Model):
     def get_chat_user_or_404(pk):
         return get_object_or_404(ChatUser, pk=pk)
 
+    def __str__(self):
+        return self.user.__str__()
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

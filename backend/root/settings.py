@@ -25,7 +25,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'no5ns^e*3su-1bhkagk8lpxg2z7vis-@4n*__7i=ns7c)$fo2s'
 
-DATABASES = {}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
+    }
+}
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ.get("ENV", "dev") == "prod":
@@ -33,10 +42,6 @@ if os.environ.get("ENV", "dev") == "prod":
     DATABASES['default'] = dj_database_url.config(ssl_require=True)
 else:
     DEBUG = True
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
