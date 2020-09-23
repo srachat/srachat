@@ -28,10 +28,10 @@ SECRET_KEY = 'no5ns^e*3su-1bhkagk8lpxg2z7vis-@4n*__7i=ns7c)$fo2s'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'NAME': os.environ.get("POSTGRES_DB", "postgres"),
+        'USER': os.environ.get("POSTGRES_USER", "postgres"),
+        'PASSWORD': os.environ.get("POSTGRES_PASSWORD", "postgres"),
+        'HOST': os.environ.get("POSTGRES_HOST", "127.0.0.1"),
         'PORT': 5432,
     }
 }

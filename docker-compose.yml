@@ -4,10 +4,14 @@ services:
   db:
     image: postgres
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      # those are used to configure the db
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
   web:
+    environment:
+      # those are used to connect to a db
+      POSTGRES_HOST: db
     build: .
     command: bash -c "python backend/manage.py migrate && python backend/manage.py runserver 0.0.0.0:8000"
     volumes:
