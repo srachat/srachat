@@ -23,25 +23,23 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'no5ns^e*3su-1bhkagk8lpxg2z7vis-@4n*__7i=ns7c)$fo2s'
+SECRET_KEY = os.environ.get("SECRET_KEY", "not-secret-key")
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': 5432,
-    }
-}
+DATABASES = {}
 
+DEBUG = int(os.environ.get("DEBUG", 1))
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ.get("ENV", "dev") == "prod":
-    DEBUG = False
     DATABASES['default'] = dj_database_url.config(ssl_require=True)
 else:
-    DEBUG = True
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get("POSTGRES_DB", 'postgres'),
+        'USER': os.environ.get("POSTGRES_USER", 'postgres'),
+        'PASSWORD': os.environ.get("POSTGRES_USER", 'postgres'),
+        'HOST': os.environ.get("POSTGRES_HOST", 'localhost'),
+        'PORT': 5432,
+    }
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
@@ -81,6 +79,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'root.urls'
@@ -146,6 +145,10 @@ STATIC_URL = '/static/'
 # Information about the location static files (for the future)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'srachat', 'static'),
+)
+
 # Media files
 MEDIA_URL = '/media/'
 
@@ -165,3 +168,24 @@ REST_FRAMEWORK = {
 
 # Django email backend
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}
