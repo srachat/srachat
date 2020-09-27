@@ -41,6 +41,7 @@ jobs:
         pip install -r backend/requirements.txt
     - name: Run migrations and Tests
       run: |
+        python manage.py collectstatic --noinput
         python manage.py migrate
         python manage.py test
       working-directory: ./backend
