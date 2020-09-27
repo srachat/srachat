@@ -43,5 +43,5 @@ jobs:
       run: |
         python manage.py collectstatic --noinput
         python manage.py migrate
-        python manage.py test
+        python manage.py test --settings=root.test_settings srachat
       working-directory: ./backend
