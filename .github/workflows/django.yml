@@ -33,6 +33,6 @@ jobs:
     - name: Run migrations and Tests
       run: |
         python manage.py collectstatic --noinput
-        python manage.py migrate
+        python manage.py migrate --settings=root.test_settings srachat
         python manage.py test --settings=root.test_settings srachat
       working-directory: ./backend
