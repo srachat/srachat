@@ -27,8 +27,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "not-secret-key")
 
 DATABASES = {}
 
-DEBUG = int(os.environ.get("DEBUG", 1))
 # SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = int(os.environ.get("DEBUG", 1))
+
 if os.environ.get("ENV", "dev") == "prod":
     DATABASES['default'] = dj_database_url.config(ssl_require=True)
 else:
