@@ -39,6 +39,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip setuptools wheel
         pip install -r backend/requirements.txt
+    - name: Make statis folder for WhiteNoise
+      run: |
+        rm -rf static
+        mkdir static
+      working-directory: ./backend/srachat
     - name: Run migrations and Tests
       run: |
         python manage.py collectstatic --noinput
