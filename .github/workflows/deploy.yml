@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     tags:
-      - version-[0-9]+.[0-9]+
+      - version-[0-9]+.[0-9]+.[0-9]+
 
 jobs:
   build:
@@ -15,7 +15,8 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: srachat
           heroku_email: ${{secrets.HEROKU_USER_EMAIL}}
+          usedocker: true
           healthcheck: "https://srachat.herokuapp.com/health"
           delay: 60
           rollbackonhealthcheckfailed: true
-          usedocker: true
+          checkstring: "ok"

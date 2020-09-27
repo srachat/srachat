@@ -20,6 +20,7 @@ from django.views.generic import TemplateView
 from rest_framework.schemas import get_schema_view
 
 from . import settings
+from .views import HealthCheck
 
 SCHEMA_NAME = "pidorapi-schema"
 
@@ -40,6 +41,10 @@ urlpatterns = [
         template_name='swagger.html',
         extra_context={'schema_url': SCHEMA_NAME}
     ), name='swagger'),
+
+    # Health check
+    path('health/', HealthCheck.as_view()),
+
 ]
 
 # For serving media files in development mode.
