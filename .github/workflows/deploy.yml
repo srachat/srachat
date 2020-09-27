@@ -16,7 +16,7 @@ jobs:
           heroku_app_name: srachat
           heroku_email: ${{secrets.HEROKU_USER_EMAIL}}
           usedocker: true
-          healthcheck: "https://srachat.herokuapp.com/health"
+          healthcheck: "https://srachat.herokuapp.com/health/"
           delay: 60
           rollbackonhealthcheckfailed: true
           checkstring: "ok"
