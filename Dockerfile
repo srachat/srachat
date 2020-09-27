@@ -15,6 +15,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # copy project to working dir
 COPY backend/ .
 
+# Manual creating of static folder
+RUN rm -rf srachat/static
+RUN mkdir srachat/static
+
 CMD sh -c " python3 manage.py collectstatic --noinput && \
             python3 manage.py migrate && \
             daphne root.asgi:application --port $PORT --bind 0.0.0.0 -v2"

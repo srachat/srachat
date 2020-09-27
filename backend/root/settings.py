@@ -27,8 +27,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "not-secret-key")
 
 DATABASES = {}
 
-DEBUG = int(os.environ.get("DEBUG", 1))
 # SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = int(os.environ.get("DEBUG", 1))
+
 if os.environ.get("ENV", "dev") == "prod":
     DATABASES['default'] = dj_database_url.config(ssl_require=True)
 else:
@@ -87,8 +88,7 @@ ROOT_URLCONF = 'root.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -102,6 +102,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'root.wsgi.application'
+ASGI_APPLICATION = 'root.asgi.application'
 
 
 # Password validation

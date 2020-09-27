@@ -23,8 +23,16 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip setuptools wheel
         pip install -r backend/requirements.txt
-    - name: Run Tests
+    - name: Make statis folder for WhiteNoise
       run: |
-        python backend/manage.py test
+        rm -rf static
+        mkdir static
+      working-directory: ./backend/srachat
+    - name: Run migrations and Tests
+      run: |
+        python manage.py collectstatic --noinput
+        python manage.py migrate --settings=root.test_settings srachat
+        python manage.py test --settings=root.test_settings srachat
+      working-directory: ./backend
