@@ -10,3 +10,4 @@ pyyaml
 uritemplate
 django-rest-auth[with_social]
 psycopg2
+whitenoise

@@ -4,15 +4,21 @@ services:
   db:
     image: postgres
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
   web:
     build: .
-    command: bash -c "python backend/manage.py migrate && python backend/manage.py runserver 0.0.0.0:8000"
+    environment:
+      DEBUG: 1
+      POSTGRES_HOST: db
+    command: >
+      sh -c " python3 manage.py collectstatic --noinput && \
+              python3 manage.py migrate && \
+              daphne root.asgi:application --port 8000 --bind 0.0.0.0 -v2"
     volumes:
       - .:/root
     ports:
-      - "8000:8000"
+      - 8000:8000
     depends_on:
       - db
