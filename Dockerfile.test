@@ -1,0 +1,19 @@
+# Base Image
+FROM python:3
+
+# set default environment variables
+ENV PYTHONUNBUFFERED 1
+
+# set working directory
+RUN mkdir /srachat
+WORKDIR /srachat
+
+# This is a redundand step to optimize the build
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# copy project to working dir
+COPY backend/ .
+
+CMD sh -c " python3 manage.py migrate --settings=root.test_settings && \
+            python3 manage.py test --settings=root.test_settings"
