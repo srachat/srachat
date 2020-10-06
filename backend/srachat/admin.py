@@ -20,5 +20,5 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('tag',)
-    search_fields = ('tag',)
+    list_display = ('name',)
+    search_fields = ('name',)
