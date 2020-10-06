@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
+    amount = models.IntegerField(max_length=4)
 
     @staticmethod
     def get_tag_room_or_404(pk):
