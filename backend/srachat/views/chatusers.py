@@ -1,5 +1,5 @@
 from rest_framework import generics, status, parsers
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,6 +14,7 @@ class ChatUserList(generics.ListAPIView):
     This view is able to display all existing rooms
     or to create a new one.
     """
+    permission_classes = [IsAdminUser]
     queryset = ChatUser.objects.all()
     serializer_class = ChatUserSerializer
 

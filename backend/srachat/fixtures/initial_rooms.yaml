@@ -1,0 +1,58 @@
+# rooms
+- model: srachat.room
+  pk: 1
+  fields:
+    title: "first room of the first user"
+    creator_id: 1
+- model: srachat.room
+  pk: 2
+  fields:
+    title: "second room of the first user"
+    creator_id: 1
+- model: srachat.room
+  pk: 3
+  fields:
+    title: "the only room of the second user"
+    creator_id: 2
+
+# filling the rooms with users
+- model: srachat.chatuser_rooms
+  pk: 1
+  fields:
+    room_id: 1
+    chatuser_id: 1
+- model: srachat.chatuser_rooms
+  pk: 2
+  fields:
+    room_id: 1
+    chatuser_id: 2
+- model: srachat.chatuser_rooms
+  pk: 3
+  fields:
+    room_id: 1
+    chatuser_id: 4
+- model: srachat.chatuser_rooms
+  pk: 4
+  fields:
+    room_id: 2
+    chatuser_id: 1
+- model: srachat.chatuser_rooms
+  pk: 5
+  fields:
+    room_id: 2
+    chatuser_id: 3
+- model: srachat.chatuser_rooms
+  pk: 6
+  fields:
+    room_id: 3
+    chatuser_id: 1
+- model: srachat.chatuser_rooms
+  pk: 7
+  fields:
+    room_id: 3
+    chatuser_id: 2
+- model: srachat.chatuser_rooms
+  pk: 8
+  fields:
+    room_id: 3
+    chatuser_id: 3

@@ -9,16 +9,23 @@ services:
       POSTGRES_PASSWORD: postgres
   web:
     build: .
+    volumes:
+    - ./initialize_data.sh:/srachat/initialize_data.sh
     environment:
       DEBUG: 1
       POSTGRES_HOST: db
     command: >
-      sh -c " python3 manage.py collectstatic --noinput && \
+      sh -c " chmod +x initialize_data.sh && \
+              python3 manage.py collectstatic --noinput && \
               python3 manage.py migrate && \
               daphne root.asgi:application --port 8000 --bind 0.0.0.0 -v2"
-    volumes:
-      - .:/root
     ports:
       - 8000:8000
     depends_on:
       - db
+    healthcheck:
+      test: curl -f http://localhost:8000/health || exit 1
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
