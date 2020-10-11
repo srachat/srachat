@@ -1,0 +1,28 @@
+- model: auth.user
+  pk: 1
+  fields:
+    username: admin
+    password: pbkdf2_sha256$216000$ETZ8QJC5rwEx$yiTy3d1j1i4z5eUCF5ZxO1XgEzenhA3BFExXsoc1Nko= # admintest
+    is_superuser: true
+    is_staff: true
+    is_active: true
+- model: auth.user
+  pk: 2
+  fields:
+    username: FirstUser
+    password: userPASSWORD123
+- model: auth.user
+  pk: 3
+  fields:
+    username: SecondUser
+    password: userPASSWORD123
+- model: auth.user
+  pk: 4
+  fields:
+    username: ThirdUser
+    password: userPASSWORD123
+- model: auth.user
+  pk: 5
+  fields:
+    username: FourthUser
+    password: userPASSWORD123
