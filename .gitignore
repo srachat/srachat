@@ -331,3 +331,6 @@ pip-selfcheck.json
 **/static/
 
 # End of https://www.gitignore.io/api/venv,python,pycharm,intellij,pycharm+all
+
+# Editor config should be personal for each user
+.editorconfig

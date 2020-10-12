@@ -15,6 +15,33 @@
     title: "the only room of the second user"
     creator_id: 2
 
+# adding tags to rooms
+- model: srachat.room_tags
+  pk: 1
+  fields:
+    room_id: 1
+    tag_id: 1
+- model: srachat.room_tags
+  pk: 2
+  fields:
+    room_id: 1
+    tag_id: 2
+- model: srachat.room_tags
+  pk: 3
+  fields:
+    room_id: 1
+    tag_id: 3
+- model: srachat.room_tags
+  pk: 4
+  fields:
+    room_id: 1
+    tag_id: 4
+- model: srachat.room_tags
+  pk: 5
+  fields:
+    room_id: 1
+    tag_id: 5
+
 # filling the rooms with users
 - model: srachat.chatuser_rooms
   pk: 1
