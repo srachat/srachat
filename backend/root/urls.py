@@ -31,9 +31,9 @@ urlpatterns = [
     #   * `title` and `description` parameters are passed to `SchemaGenerator`.
     #   * Provide view name for use with `reverse()`.
     path('pidorapi/', get_schema_view(
-        title="Your Project",
+        title="Srachat API Scheme",
         description="API for all things … and pidors",
-        version="1.0.0"
+        version="0.0.0"
     ), name=SCHEMA_NAME),
     # Route TemplateView to serve Swagger UI template.
     #   * Provide `extra_context` with view name of `SchemaView`.

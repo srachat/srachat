@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from .views import chatusers, comments, rooms
+from .views import chatusers, comments, rooms, tags
 
 urlpatterns = [
     # Chat endpoints
@@ -17,6 +17,9 @@ urlpatterns = [
     path('rooms/<int:pk>/users/', chatusers.RoomUserList.as_view(), name="list_room_users"),
     path('users/', chatusers.ChatUserList.as_view(), name="list_users"),
     path('users/<int:pk>/', chatusers.ChatUserDetail.as_view(), name="user_details"),
+
+    # Tag endpoints
+    path('tags/', tags.TagList.as_view(), name="list_tags"),
 
 
     # Rest auth endpoints

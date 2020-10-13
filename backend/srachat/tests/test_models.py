@@ -10,6 +10,7 @@ from sqlite3 import IntegrityError as sq_IntegrityError
 from ..models.comment import Comment
 from ..models.user import ChatUser
 from ..models.room import Room
+from ..models.tag import Tag
 
 CHAT_USER_NAME_1 = "first username"
 CHAT_USER_NAME_2 = "second username"
@@ -231,3 +232,9 @@ class CommentTest(TestCase):
     def test_all_comments_have_correct_creation_time(self):
         for comment in fetch_all_comments():
             self.assertTrue(comment.created < timezone.now())
+
+
+class TagTest(TestCase):
+    def test_fetch_tags(self):
+        tags = Tag.objects.all()
+        self.assertTrue(len(tags) > 0)
