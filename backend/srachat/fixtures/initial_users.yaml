@@ -10,19 +10,19 @@
   pk: 2
   fields:
     username: FirstUser
-    password: userPASSWORD123
+    password: pbkdf2_sha256$216000$CJ3bDtMBbA9Z$vxriD8H+kL4sSERl4Yt9GvUnn0dglkjX7ai2XWa4nAw= # userPASSWORD123
 - model: auth.user
   pk: 3
   fields:
     username: SecondUser
-    password: userPASSWORD123
+    password: pbkdf2_sha256$216000$CJ3bDtMBbA9Z$vxriD8H+kL4sSERl4Yt9GvUnn0dglkjX7ai2XWa4nAw= # userPASSWORD123
 - model: auth.user
   pk: 4
   fields:
     username: ThirdUser
-    password: userPASSWORD123
+    password: pbkdf2_sha256$216000$CJ3bDtMBbA9Z$vxriD8H+kL4sSERl4Yt9GvUnn0dglkjX7ai2XWa4nAw= # userPASSWORD123
 - model: auth.user
   pk: 5
   fields:
     username: FourthUser
-    password: userPASSWORD123
+    password: pbkdf2_sha256$216000$CJ3bDtMBbA9Z$vxriD8H+kL4sSERl4Yt9GvUnn0dglkjX7ai2XWa4nAw= # userPASSWORD123

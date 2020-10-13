@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models.comment import Comment
 from .models.room import Room
+from .models.tag import Tag
 
 
 @admin.register(Room)
@@ -15,3 +16,9 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ('body', 'room', 'created')
     list_filter = ('room',)
     search_fields = ('body',)
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)

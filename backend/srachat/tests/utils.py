@@ -56,9 +56,11 @@ class RoomUtils:
 
     DATA_ROOM_FIRST = {
         "title": ROOM_NAME_FIRST,
+        "tags": [1, 2, 3]
     }
     DATA_ROOM_SECOND = {
         "title": ROOM_NAME_SECOND,
+        "tags": [1, 2, 3]
     }
 
 
