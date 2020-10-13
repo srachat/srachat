@@ -34,7 +34,7 @@ class RoomUserList(APIView):
 
     def get(self, request, pk, format=None):
         room = Room.get_room_or_404(pk)
-        chat_user_ids = ChatUser.objects.filter(rooms=room, user__is_staff=False).values_list('id', flat=True)
+        chat_user_ids = ChatUser.objects.filter(rooms=room).values_list('id', flat=True)
         return Response(chat_user_ids)
 
     def post(self, request, pk):

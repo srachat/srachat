@@ -1,10 +1,25 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Dict
 
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
+
+
+@dataclass
+class TestUser:
+    username: str
+    password1: str
+    email: str
+    first_name: str = None
+    last_name: str = None
+
+    def as_dict(self):
+        test_user_dict = asdict(self)
+        test_user_dict["password2"] = self.password1
+        return test_user_dict
 
 
 @dataclass
@@ -14,31 +29,19 @@ class UserUtils:
     USERNAME_SECOND = USERNAME + "2"
     USERNAME_THIRD = USERNAME + "3"
 
-    EMAIL = "email1@email.com"
-    EMAIL_FIRST = EMAIL + "1"
-    EMAIL_SECOND = EMAIL + "2"
-    EMAIL_THIRD = EMAIL + "3"
+    EMAIL = "email@email.com"
+    EMAIL_FIRST = "1" + EMAIL
+    EMAIL_SECOND = "2" + EMAIL
+    EMAIL_THIRD = "3" + EMAIL
 
     PASSWORD = "ez3}yh^L4%27Dnn]"
 
-    DATA_FIRST = {
-        "username": USERNAME_FIRST,
-        "email": EMAIL_FIRST,
-        "password1": PASSWORD,
-        "password2": PASSWORD
-    }
-    DATA_SECOND = {
-        "username": USERNAME_SECOND,
-        "email": EMAIL_SECOND,
-        "password1": PASSWORD,
-        "password2": PASSWORD
-    }
-    DATA_THIRD = {
-        "username": USERNAME_THIRD,
-        "email": EMAIL_THIRD,
-        "first_name": "first_name",
-        "last_name": "last_name"
-    }
+    DATA_FIRST = TestUser(USERNAME_FIRST, PASSWORD, EMAIL_FIRST).as_dict()
+    DATA_SECOND = TestUser(USERNAME_SECOND, PASSWORD, EMAIL_SECOND).as_dict()
+    DATA_THIRD = TestUser(
+        USERNAME_THIRD, PASSWORD, EMAIL_THIRD, first_name="first_name", last_name="last_name"
+    ).as_dict()
+    DATA_ADMIN = TestUser("admin", "adminTESTPASSWORD123", "admin" + EMAIL).as_dict()
 
 
 @dataclass
@@ -91,6 +94,16 @@ class SrachatTestCase(APITestCase):
     def register_user_return_token(self, user_data: Dict[str, str]) -> str:
         response = self.register_user_return_response(user_data)
         return response.data["key"]
+
+    def register_admin_return_user(self) -> User:
+        post_response = self.register_user_return_response(UserUtils.DATA_ADMIN)
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+
+        user = User.objects.get(username=UserUtils.DATA_ADMIN["username"])
+        user.is_staff = True
+        user.save()
+
+        return user
 
     def check_safe_methods(self, url: str):
         response_delete = self.client.delete(url)
