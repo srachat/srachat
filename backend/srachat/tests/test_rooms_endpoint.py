@@ -11,6 +11,7 @@ from ..tests.utils import UserUtils, RoomUtils, UrlUtils, SrachatTestCase
     RoomTest - GET: '/pidor/rooms/{id}' - test of getting correct room info
     RoomTest - PATCH: '/pidor/rooms/{id}/' test of update room info by creator room/ other user
     RoomTest - DELETE: '/pidor/rooms/{id}/' test of delete room info by creator room/ other user
+    RoomTest - GET: '/pidor/rooms/{id}/users/' test who is displayed as room users
     
 """
 
@@ -73,6 +74,8 @@ class RoomsTest(SrachatTestCase):
         post_response = self.client.post(url, data=RoomUtils.DATA_ROOM_FIRST, format="json")
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Room.objects.count(), 1)
+        # first user becomes a participant of his own room
+        self.client.post(reverse(UrlUtils.Rooms.USERS, args=[1]), format="json")
 
     def test_room_list(self):
         """
@@ -193,3 +196,13 @@ class RoomsTest(SrachatTestCase):
         data = get_response.data
         self.assertEqual(data["title"], RoomUtils.ROOM_NAME_FIRST)
         self.assertEqual(data["creator"], 1)
+
+    def test_get_room_users(self):
+        """
+            GET: '/pidor/rooms/{id}/users/
+        """
+        url_users = reverse(UrlUtils.Rooms.USERS, args=[1])
+
+        response = self.client.get(url_users)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)

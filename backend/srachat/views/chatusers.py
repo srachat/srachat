@@ -14,7 +14,7 @@ class ChatUserList(generics.ListAPIView):
     This view is able to display all existing rooms
     or to create a new one.
     """
-    queryset = ChatUser.objects.all()
+    queryset = ChatUser.objects.filter(user__is_staff=False)
     serializer_class = ChatUserSerializer
 
 
@@ -25,7 +25,7 @@ class ChatUserDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     permission_classes = [IsAuthenticatedOrReadOnly & IsAccountOwnerOrReadOnly]
     parser_classes = [parsers.MultiPartParser]
-    queryset = ChatUser.objects.all()
+    queryset = ChatUser.objects.filter(user__is_staff=False)
     serializer_class = ChatUserSerializer
 
 
