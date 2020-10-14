@@ -11,8 +11,7 @@ from ..serializers.chatuser_serializer import ChatUserSerializer
 
 class ChatUserList(generics.ListAPIView):
     """
-    This view is able to display all existing rooms
-    or to create a new one.
+    This view is able to display all existing users.
     """
     queryset = ChatUser.objects.filter(user__is_staff=False)
     serializer_class = ChatUserSerializer
@@ -20,8 +19,7 @@ class ChatUserList(generics.ListAPIView):
 
 class ChatUserDetail(generics.RetrieveUpdateDestroyAPIView):
     """
-    This view is able to display all existing rooms
-    or to create a new one.
+    This view is able to display or update the user data.
     """
     permission_classes = [IsAuthenticatedOrReadOnly & IsAccountOwnerOrReadOnly]
     parser_classes = [parsers.MultiPartParser]
@@ -30,6 +28,9 @@ class ChatUserDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class RoomUserList(APIView):
+    """
+    Returns all users of a room, adds a new one or deletes a caller of the endpoint.
+    """
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, pk, format=None):

@@ -6,6 +6,7 @@ from .tag import Tag
 class Room(models.Model):
     TAGS_AMOUNT = 4
 
+    admins = models.ManyToManyField("ChatUser", related_name="administrated_rooms", default=[])
     creator = models.ForeignKey(
         "ChatUser", null=True, on_delete=models.CASCADE, related_name="created_room"
     )
