@@ -67,6 +67,9 @@ class RoomsTest(SrachatTestCase):
         # Registration of the second user
         self.auth_token_second = self.register_user_return_token(UserUtils.DATA_SECOND)
 
+        # Registration of the third user
+        self.auth_token_third = self.register_user_return_token(UserUtils.DATA_THIRD)
+
         # Authorization of the first user
         self.set_credentials(self.auth_token_first)
 
@@ -111,12 +114,14 @@ class RoomsTest(SrachatTestCase):
         url_info = reverse(UrlUtils.Rooms.DETAILS, args=[1])
 
         get_response = self.client.get(url_info)
-        keys = ["title", "creator"]
-        self.assertTrue(all([key in get_response.data.keys() for key in keys]))
+        keys = ["id", "title", "creator", "admins", "tags"]
+        self.assertCountEqual(list(get_response.data.keys()), keys)
 
         data = get_response.data
         self.assertEqual(data["title"], RoomUtils.ROOM_NAME_FIRST)
         self.assertEqual(data["creator"], 1)
+        self.assertCountEqual(data["tags"], [1, 2, 3])
+        self.assertCountEqual(data["admins"], [1])
 
     def test_post_room_info(self):
         """
@@ -135,6 +140,34 @@ class RoomsTest(SrachatTestCase):
         updated_title = "updated_title"
 
         url_info = reverse(UrlUtils.Rooms.DETAILS, args=[1])
+
+        patch_response = self.client.patch(
+            path=url_info,
+            data={"title": updated_title}
+        )
+        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
+
+        get_response = self.client.get(url_info)
+        self.assertEqual(get_response.data["title"], updated_title)
+
+    def test_update_room_info_by_room_admin(self):
+        """
+            PATCH: '/pidor/rooms/{id}/'
+        """
+        updated_title = "updated_title"
+
+        url_info = reverse(UrlUtils.Rooms.DETAILS, args=[1])
+
+        get_response = self.client.get(url_info)
+        current_admins = get_response.data["admins"]
+
+        patch_response = self.client.patch(
+            path=url_info,
+            data={"admins": current_admins + [3]}
+        )
+        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
+
+        self.set_credentials(self.auth_token_third)
 
         patch_response = self.client.patch(
             path=url_info,
@@ -189,13 +222,16 @@ class RoomsTest(SrachatTestCase):
         delete_response = self.client.delete(url_info)
         self.assertEqual(delete_response.status_code, status.HTTP_403_FORBIDDEN)
 
+        # required to check whether everything remains the same
         get_response = self.client.get(url_info)
-        keys = ["title", "creator"]
-        self.assertTrue(all([key in get_response.data.keys() for key in keys]))
+        keys = ["id", "title", "creator", "admins", "tags"]
+        self.assertCountEqual(list(get_response.data.keys()), keys)
 
         data = get_response.data
         self.assertEqual(data["title"], RoomUtils.ROOM_NAME_FIRST)
         self.assertEqual(data["creator"], 1)
+        self.assertCountEqual(data["tags"], [1, 2, 3])
+        self.assertCountEqual(data["admins"], [1])
 
     def test_get_room_users(self):
         """

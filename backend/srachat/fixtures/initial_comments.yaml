@@ -4,123 +4,123 @@
     body: "first comment"
     created: "2020-10-10 22:00:00+00:00"
     room_id: 1
-    creator_id: 1
+    creator_id: 2
 - model: srachat.comment
   pk: 2
   fields:
     body: "second comment"
     created: "2020-10-10 22:01:00+00:00"
     room_id: 1
-    creator_id: 2
+    creator_id: 3
 - model: srachat.comment
   pk: 3
   fields:
     body: "third comment"
     created: "2020-10-10 22:02:00+00:00"
     room_id: 1
-    creator_id: 1
+    creator_id: 2
 - model: srachat.comment
   pk: 4
   fields:
     body: "fourth comment"
     created: "2020-10-10 22:03:00+00:00"
     room_id: 1
-    creator_id: 4
+    creator_id: 5
 - model: srachat.comment
   pk: 5
   fields:
     body: "fifth comment"
     created: "2020-10-10 22:04:00+00:00"
     room_id: 1
-    creator_id: 4
+    creator_id: 5
 - model: srachat.comment
   pk: 6
   fields:
     body: "sixth comment"
     created: "2020-10-10 22:05:00+00:00"
     room_id: 1
-    creator_id: 2
+    creator_id: 3
 - model: srachat.comment
   pk: 7
   fields:
     body: "seventh comment"
     created: "2020-10-10 22:06:00+00:00"
     room_id: 2
-    creator_id: 1
+    creator_id: 2
 - model: srachat.comment
   pk: 8
   fields:
     body: "eighth comment"
     created: "2020-10-10 22:07:00+00:00"
     room_id: 2
-    creator_id: 3
+    creator_id: 4
 - model: srachat.comment
   pk: 9
   fields:
     body: "ninth comment"
     created: "2020-10-10 22:08:00+00:00"
     room_id: 2
-    creator_id: 1
+    creator_id: 2
 - model: srachat.comment
   pk: 10
   fields:
     body: "tenth comment"
     created: "2020-10-10 22:09:00+00:00"
     room_id: 2
-    creator_id: 1
+    creator_id: 2
 - model: srachat.comment
   pk: 11
   fields:
     body: "eleventh comment"
     created: "2020-10-10 22:10:00+00:00"
     room_id: 2
-    creator_id: 3
+    creator_id: 4
 - model: srachat.comment
   pk: 12
   fields:
     body: "twelfth comment"
     created: "2020-10-10 22:11:00+00:00"
     room_id: 2
-    creator_id: 3
+    creator_id: 4
 - model: srachat.comment
   pk: 13
   fields:
     body: "thirteenth comment"
     created: "2020-10-10 22:12:00+00:00"
     room_id: 3
-    creator_id: 1
+    creator_id: 2
 - model: srachat.comment
   pk: 14
   fields:
     body: "fourteenth comment"
     created: "2020-10-10 22:13:00+00:00"
     room_id: 3
-    creator_id: 2
+    creator_id: 3
 - model: srachat.comment
   pk: 15
   fields:
     body: "fifteenth comment"
     created: "2020-10-10 22:14:00+00:00"
     room_id: 3
-    creator_id: 2
+    creator_id: 3
 - model: srachat.comment
   pk: 16
   fields:
     body: "sixteenth comment"
     created: "2020-10-10 22:15:00+00:00"
     room_id: 3
-    creator_id: 2
+    creator_id: 3
 - model: srachat.comment
   pk: 17
   fields:
     body: "seventeenth comment"
     created: "2020-10-10 22:16:00+00:00"
     room_id: 3
-    creator_id: 3
+    creator_id: 4
 - model: srachat.comment
   pk: 18
   fields:
     body: "eighteenth comment"
     created: "2020-10-10 22:17:00+00:00"
     room_id: 3
-    creator_id: 3
+    creator_id: 4
