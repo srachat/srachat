@@ -49,8 +49,6 @@ class IsRoomAdminOrReadOnly(AbstractSrachatReadOnlyPermission):
     Custom permission to allow only room admins to change the info about the room
     """
 
-    message = "Only admins or the room creator can change room info"
-
     @staticmethod
     def get_condition(request, view, obj) -> bool:
         return ChatUser.objects.get(user=request.user) in obj.admins.all()
