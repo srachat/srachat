@@ -67,6 +67,9 @@ class RoomsTest(SrachatTestCase):
         # Registration of the second user
         self.auth_token_second = self.register_user_return_token(UserUtils.DATA_SECOND)
 
+        # Registration of the third user
+        self.auth_token_third = self.register_user_return_token(UserUtils.DATA_THIRD)
+
         # Authorization of the first user
         self.set_credentials(self.auth_token_first)
 
@@ -137,6 +140,34 @@ class RoomsTest(SrachatTestCase):
         updated_title = "updated_title"
 
         url_info = reverse(UrlUtils.Rooms.DETAILS, args=[1])
+
+        patch_response = self.client.patch(
+            path=url_info,
+            data={"title": updated_title}
+        )
+        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
+
+        get_response = self.client.get(url_info)
+        self.assertEqual(get_response.data["title"], updated_title)
+
+    def test_update_room_info_by_room_admin(self):
+        """
+            PATCH: '/pidor/rooms/{id}/'
+        """
+        updated_title = "updated_title"
+
+        url_info = reverse(UrlUtils.Rooms.DETAILS, args=[1])
+
+        get_response = self.client.get(url_info)
+        current_admins = get_response.data["admins"]
+
+        patch_response = self.client.patch(
+            path=url_info,
+            data={"admins": current_admins + [3]}
+        )
+        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
+
+        self.set_credentials(self.auth_token_third)
 
         patch_response = self.client.patch(
             path=url_info,

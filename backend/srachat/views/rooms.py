@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from ..models.user import ChatUser
 from ..models.room import Room
-from ..permissions import IsCreatorOrReadOnly
+from ..permissions import IsCreatorOrReadOnly, IsRoomAdminOrReadOnly
 from ..serializers.room_serializer import RoomSerializer
 
 
@@ -30,6 +30,6 @@ class RoomDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     This view is able to display, update and delete a single room.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly & IsCreatorOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly & (IsCreatorOrReadOnly | IsRoomAdminOrReadOnly)]
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
