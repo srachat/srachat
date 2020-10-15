@@ -13,6 +13,11 @@ define output_text
 endef
 
 
+# General commands
+initialize-test-data:
+	docker exec -it srachat_web_1 sh -c "./initialize_data.sh"
+
+
 # Backend main application
 run-be-detached: prepare-be run-be-image-detached
 run-be-attached: prepare-be run-be-image-attached
