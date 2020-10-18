@@ -1,6 +1,8 @@
 from django.db import models
 from django.shortcuts import get_object_or_404
 
+from .team_number import TeamNumber
+
 
 class Comment(models.Model):
     body = models.TextField()
@@ -9,6 +11,7 @@ class Comment(models.Model):
         "ChatUser", null=True, on_delete=models.CASCADE, related_name="created_comment"
     )
     room = models.ForeignKey("Room", on_delete=models.CASCADE, related_name='comments')
+    team_number = models.PositiveSmallIntegerField(choices=TeamNumber.choices, default=TeamNumber.FIRST_TEAM)
 
     class Meta:
         ordering = ('created',)

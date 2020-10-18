@@ -23,6 +23,11 @@ class TestUser:
 
 
 @dataclass
+class TestComment:
+    body: str
+
+
+@dataclass
 class UserUtils:
     USERNAME = "user_name_"
     USERNAME_FIRST = USERNAME + "1"
@@ -46,9 +51,15 @@ class UserUtils:
 
 @dataclass
 class CommentUtils:
-    DATA_COMMENT_FIRST = {
-        "body": "this is comment"
-    }
+    COMMENT_FIRST = "this is the first comment"
+    COMMENT_SECOND = "this is the second comment"
+    COMMENT_THIRD = "this is the third comment"
+    COMMENT_FOURTH = "this is the fourth comment"
+
+    DATA_COMMENT_FIRST = asdict(TestComment(COMMENT_FIRST))
+    DATA_COMMENT_SECOND = asdict(TestComment(COMMENT_SECOND))
+    DATA_COMMENT_THIRD = asdict(TestComment(COMMENT_THIRD))
+    DATA_COMMENT_FOURTH = asdict(TestComment(COMMENT_FOURTH))
 
 
 @dataclass

@@ -3,9 +3,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from ..models.comment import Comment
-from ..models.user import ChatUser
+from ..models.user import ChatUser, Participation
 from ..models.room import Room
-from ..permissions import IsCreatorOrReadOnly, IsRoomParticipantOrReadOnly
+from ..permissions import IsCreatorOrReadOnly, IsRoomParticipantOrReadOnly, IsCommentInAllowedRoomOrReadOnly
 from ..serializers.comment_serializer import CommentSerializer, SingleRoomCommentSerializer
 
 
@@ -26,16 +26,29 @@ class CommentList(generics.GenericAPIView):
 
     def post(self, request, pk, format=None):
         room = self.get_object()
+        if not room.is_active:
+            return Response(
+                "You cannot leave a comment in an inactive room",
+                status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS
+            )
+
+        comment_creator = ChatUser.objects.get(user=request.user)
+        if comment_creator in room.banned_users.all():
+            return Response("You are banned in this room", status=status.HTTP_403_FORBIDDEN)
+
         serializer = SingleRoomCommentSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(room=room, creator=ChatUser.objects.get(user=request.user))
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(
+            room=room, creator=comment_creator,
+            team_number=Participation.objects.get(chatuser=comment_creator, room=room).team_number
+        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     This view is able to display, update and delete a single comment.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly & IsCreatorOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly & IsCreatorOrReadOnly & IsCommentInAllowedRoomOrReadOnly]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
