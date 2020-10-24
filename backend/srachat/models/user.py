@@ -12,6 +12,13 @@ class Participation(models.Model):
     room = models.ForeignKey("Room", on_delete=models.CASCADE)
     team_number = models.PositiveSmallIntegerField(choices=TeamNumber.choices)
 
+    def save(self, *args, **kwargs):
+        # TODO: optimize with indexing
+        participants_in_team = Participation.objects.filter(room=self.room, team_number=self.team_number).count()
+        if participants_in_team >= self.room.max_participants_in_team:
+            raise OverflowError(f"Team number {self.team_number} is full.")
+        super().save(*args, **kwargs)
+
     class Meta:
         unique_together = ("chatuser", "room")
 

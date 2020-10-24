@@ -48,7 +48,7 @@ class RoomVotes(models.Model):
     voter = models.ForeignKey("ChatUser", on_delete=models.CASCADE)
 
     # This one is added for possible statistics
-    date_voted = models.DateTimeField(auto_now_add=True)
+    date_voted = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ("voter", "room")

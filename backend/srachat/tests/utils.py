@@ -1,3 +1,4 @@
+from collections import namedtuple
 from dataclasses import asdict, dataclass
 from typing import Dict
 
@@ -62,20 +63,23 @@ class CommentUtils:
     DATA_COMMENT_FOURTH = asdict(TestComment(COMMENT_FOURTH))
 
 
+RoomData = namedtuple("RoomData", ("title", "tags", "first_team_name", "second_team_name"))
+
+
 @dataclass
 class RoomUtils:
     ROOM_NAME = "room_name_"
     ROOM_NAME_FIRST = ROOM_NAME + "1"
     ROOM_NAME_SECOND = ROOM_NAME + "2"
 
-    DATA_ROOM_FIRST = {
-        "title": ROOM_NAME_FIRST,
-        "tags": [1, 2, 3]
-    }
-    DATA_ROOM_SECOND = {
-        "title": ROOM_NAME_SECOND,
-        "tags": [1, 2, 3]
-    }
+    DATA_ROOM_FIRST = RoomData(
+        title=ROOM_NAME_FIRST, tags=[1, 2, 3],
+        first_team_name="first room first team", second_team_name="first room second team",
+    )
+    DATA_ROOM_SECOND = RoomData(
+        title=ROOM_NAME_SECOND, tags=[1, 2, 3, 4],
+        first_team_name="second room first team", second_team_name="second room second team",
+    )
 
 
 class UrlUtils:
