@@ -17,15 +17,19 @@ from ..tests.utils import UserUtils, RoomUtils, UrlUtils, SrachatTestCase
 
 
 class RoomCreationTest(SrachatTestCase):
+    """
+        Test of different possibilities of new room creation.
+        # TODO: Finish the documentation: Artem Jasan
+
+        All tests use the following endpoint:
+        POST: '/pidor/rooms/'
+    """
+
     def setUp(self):
         self.auth_token = self.register_user_return_token(UserUtils.DATA_FIRST)
         self.url = reverse(UrlUtils.Rooms.LIST)
 
     def test_room_creation_authenticated(self):
-        """
-            POST: '/pidor/rooms/'
-        """
-
         self.set_credentials(self.auth_token)
         post_response = self.client.post(self.url, data=RoomUtils.DATA_ROOM_FIRST, format="json")
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
@@ -49,10 +53,6 @@ class RoomCreationTest(SrachatTestCase):
         self.assertEqual(Room.objects.count(), 0)
 
     def test_room_creation_unauthenticated(self):
-        """
-            POST: '/pidor/rooms/'
-        """
-
         post_response = self.client.post(self.url, data=RoomUtils.DATA_ROOM_FIRST, format="json")
         self.assertEqual(post_response.status_code, status.HTTP_401_UNAUTHORIZED)
 
