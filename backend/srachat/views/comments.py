@@ -14,7 +14,7 @@ class CommentList(generics.GenericAPIView):
     This view is able to display or add comments in all srachat rooms
     or if the room id is given to display or add comments to the given room.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly & IsRoomParticipantOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly & IsRoomParticipantOrReadOnly & IsCommentInAllowedRoomOrReadOnly]
     queryset = Room.objects.all()
     serializer_class = SingleRoomCommentSerializer
 
