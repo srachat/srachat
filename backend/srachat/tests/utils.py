@@ -1,6 +1,6 @@
 from collections import namedtuple
 from dataclasses import asdict, dataclass
-from typing import Dict
+from typing import Any, Dict, List
 
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -63,14 +63,14 @@ class CommentUtils:
     DATA_COMMENT_FOURTH = asdict(TestComment(COMMENT_FOURTH))
 
 
-RoomData = namedtuple("RoomData", ("title", "tags", "first_team_name", "second_team_name"))
-
-
 @dataclass
 class RoomUtils:
     ROOM_NAME = "room_name_"
     ROOM_NAME_FIRST = ROOM_NAME + "1"
     ROOM_NAME_SECOND = ROOM_NAME + "2"
+
+    RoomData = namedtuple("RoomData", ("title", "tags", "first_team_name", "second_team_name"))
+    FIELDS = set(RoomData._fields)
 
     DATA_ROOM_FIRST = RoomData(
         title=ROOM_NAME_FIRST, tags=[1, 2, 3],
@@ -80,6 +80,20 @@ class RoomUtils:
         title=ROOM_NAME_SECOND, tags=[1, 2, 3, 4],
         first_team_name="second room first team", second_team_name="second room second team",
     )
+
+    @staticmethod
+    def get_room_data_without_fields(data: RoomData, excluded_fields: List[str]) -> Dict[str, Any]:
+        result_fields = RoomUtils.FIELDS.difference(excluded_fields)
+        return {
+            field_name: getattr(data, field_name)
+            for field_name in result_fields
+        }
+
+    @staticmethod
+    def get_room_data_with_extra_field(data: RoomData, key: str, value: Any) -> Dict[str, Any]:
+        new_data = data._asdict().copy()
+        new_data[key] = value
+        return new_data
 
 
 class UrlUtils:

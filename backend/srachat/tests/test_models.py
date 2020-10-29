@@ -15,7 +15,7 @@ from django.utils import timezone
 from ..models.comment import Comment
 from ..models.language import LanguageChoices
 from ..models.user import ChatUser, Participation
-from ..models.room import Room, RoomVotes
+from ..models.room import Room, RoomVote
 from ..models.tag import Tag
 from .utils import CommentUtils, RoomUtils, UserUtils
 
@@ -153,6 +153,7 @@ class RoomTest(TestCase):
     Both rooms have a set language.
     The second one has no rooms of participation.
     RoomVote is added whenever any user votes for any team.
+    # TODO: correctly rewrite the documentation
     """
     def setUp(self):
         self.first_user, self.second_user, self.third_user = create_predefined_users(
@@ -218,6 +219,15 @@ class RoomTest(TestCase):
         with self.assertRaises(OverflowError):
             Participation.objects.create(chatuser=self.third_user, room=second_room, team_number=1)
 
+    def test_set_participant_amount_higher_than_max_possible(self):
+        with self.assertRaises(ValidationError):
+            Room.objects.create(
+                creator=self.first_user, title=RoomUtils.DATA_ROOM_FIRST.title + "a",
+                first_team_name=RoomUtils.DATA_ROOM_FIRST.first_team_name,
+                second_team_name=RoomUtils.DATA_ROOM_FIRST.second_team_name,
+                max_participants_in_team=Room.POSSIBLE_MAX_PARTICIPANTS + 1
+            ).full_clean()
+
     def test_each_user_can_be_participant_just_once(self):
         # second room allows only two users
         first_room, _ = fetch_two_predefined_rooms()
@@ -270,32 +280,32 @@ class RoomTest(TestCase):
     def test_user_votes_for_team(self):
         first_room, _ = fetch_two_predefined_rooms()
 
-        RoomVotes.objects.create(room=first_room, voter=self.first_user, team_number=1)
-        room_vote = RoomVotes.objects.filter(room=first_room, voter=self.first_user)
+        RoomVote.objects.create(room=first_room, voter=self.first_user, team_number=1)
+        room_vote = RoomVote.objects.filter(room=first_room, voter=self.first_user)
         self.assertTrue(room_vote.exists())
 
         # user cannot create two votes
         with self.assertRaises(IntegrityError), transaction.atomic():
-            RoomVotes.objects.create(room=first_room, voter=self.first_user, team_number=1)
+            RoomVote.objects.create(room=first_room, voter=self.first_user, team_number=1)
         with self.assertRaises(IntegrityError), transaction.atomic():
-            RoomVotes.objects.create(room=first_room, voter=self.first_user, team_number=2)
+            RoomVote.objects.create(room=first_room, voter=self.first_user, team_number=2)
 
         # user votes for another team
-        room_vote = RoomVotes.objects.get(room=first_room, voter=self.first_user)
+        room_vote = RoomVote.objects.get(room=first_room, voter=self.first_user)
         time_created = room_vote.date_voted
         room_vote.team_number = 2
         room_vote.save()
         time_changed_1 = room_vote.date_voted
 
         # check the team number changed
-        room_vote = RoomVotes.objects.get(room=first_room, voter=self.first_user)
+        room_vote = RoomVote.objects.get(room=first_room, voter=self.first_user)
         self.assertEqual(room_vote.team_number, 2)
 
         # check can revoke a vote
         room_vote.team_number = 0
         room_vote.save()
         time_changed_2 = room_vote.date_voted
-        room_vote = RoomVotes.objects.get(room=first_room, voter=self.first_user)
+        room_vote = RoomVote.objects.get(room=first_room, voter=self.first_user)
         self.assertEqual(room_vote.team_number, 0)
 
         # check cannot for a any other team than 1, 2 or revoke a vote with 0
@@ -307,6 +317,85 @@ class RoomTest(TestCase):
         self.assertGreater(time_changed_2, time_changed_1)
         self.assertEqual(room_vote.room, first_room)
         self.assertEqual(room_vote.voter, self.first_user)
+
+    def test_room_deletes_after_user_deletion(self):
+        first_room, _ = fetch_two_predefined_rooms()
+        self.first_user.delete()
+
+        self.assertFalse(Room.objects.filter(title=RoomUtils.ROOM_NAME_FIRST).exists())
+
+    def test_room_vote_deletes_after_room_deletion(self):
+        first_room, _ = fetch_two_predefined_rooms()
+
+        RoomVote.objects.create(room=first_room, voter=self.first_user, team_number=1)
+        room_vote = RoomVote.objects.filter(room=first_room, voter=self.first_user)
+        self.assertTrue(room_vote.exists())
+
+        first_room.delete()
+        self.assertTrue(not room_vote.exists())
+
+    def test_room_vote_deletes_after_user_deletion(self):
+        first_room, _ = fetch_two_predefined_rooms()
+
+        RoomVote.objects.create(room=first_room, voter=self.first_user, team_number=1)
+        room_vote = RoomVote.objects.filter(room=first_room, voter=self.first_user)
+        self.assertTrue(room_vote.exists())
+
+        self.first_user.delete()
+        self.assertTrue(not room_vote.exists())
+
+    def test_participation_deletes_after_room_deletion(self):
+        first_room, _ = fetch_two_predefined_rooms()
+        Participation.objects.create(chatuser=self.first_user, room=first_room, team_number=1)
+        participation = Participation.objects.filter(chatuser=self.first_user, room=first_room)
+        self.assertTrue(participation.exists())
+
+        first_room.delete()
+        self.assertTrue(not participation.exists())
+
+    def test_participation_deletes_after_user_deletion(self):
+        first_room, _ = fetch_two_predefined_rooms()
+        Participation.objects.create(chatuser=self.first_user, room=first_room, team_number=1)
+        participation = Participation.objects.filter(chatuser=self.first_user, room=first_room)
+        self.assertTrue(participation.exists())
+
+        self.first_user.delete()
+        self.assertTrue(not participation.exists())
+
+    def test_room_max_title_length(self):
+        too_long_title = "a" * (Room.TITLE_MAX_LENGTH + 1)
+        with self.assertRaises(ValidationError):
+            Room.objects.create(
+                creator=self.first_user, title=too_long_title,
+                first_team_name=RoomUtils.DATA_ROOM_FIRST.first_team_name,
+                second_team_name=RoomUtils.DATA_ROOM_FIRST.second_team_name
+            ).full_clean()
+
+    def test_room_creation_max_team_name_length(self):
+        too_long_team_name = "a" * (Room.TEAM_NAME_MAX_LENGTH + 1)
+        with self.assertRaises(ValidationError), transaction.atomic():
+            Room.objects.create(
+                creator=self.first_user, title=RoomUtils.DATA_ROOM_FIRST.title + "a",
+                first_team_name=too_long_team_name,
+                second_team_name=RoomUtils.DATA_ROOM_FIRST.second_team_name
+            ).full_clean()
+
+    def test_team_votes_cant_be_negative(self):
+        room = Room.objects.create(
+            creator=self.first_user, title=RoomUtils.DATA_ROOM_FIRST.title + "a",
+            first_team_name=RoomUtils.DATA_ROOM_FIRST.first_team_name,
+            second_team_name=RoomUtils.DATA_ROOM_FIRST.second_team_name
+        )
+        room.first_team_votes = -1
+        with self.assertRaises(IntegrityError):
+            room.save()
+
+    def test_both_teams_have_zero_votes(self):
+        first_room, second_room = fetch_two_predefined_rooms()
+        self.assertEqual(first_room.first_team_votes, 0)
+        self.assertEqual(first_room.second_team_votes, 0)
+        self.assertEqual(second_room.first_team_votes, 0)
+        self.assertEqual(second_room.second_team_votes, 0)
 
 
 class CommentTest(TestCase):
@@ -322,6 +411,7 @@ class CommentTest(TestCase):
     - Each comment should have a correct creator
     - Each comment corresponds to a room
     - Each comment should have a correct creation time (it should be in past)
+    # TODO: rewrite the scenario
     """
     def setUp(self):
         self.first_user, self.second_user, self.third_user = create_predefined_users(
@@ -400,6 +490,22 @@ class CommentTest(TestCase):
             fetch_comment_by_creator(CommentUtils.COMMENT_FOURTH, self.second_user).first().team_number
         ]
         self.assertListEqual(team_numbers, [1, 1, 2, 2])
+
+    def test_comments_deletes_after_room_deletion(self):
+        _, second_room = fetch_two_predefined_rooms()
+        comments = Comment.objects.filter(room=second_room)
+        self.assertTrue(comments.exists())
+
+        second_room.delete()
+        self.assertTrue(not comments.exists())
+
+    def test_comments_deletes_after_user_deletion(self):
+        _, second_room = fetch_two_predefined_rooms()
+        comments = Comment.objects.filter(creator=self.first_user)
+        self.assertTrue(comments.exists())
+
+        self.first_user.delete()
+        self.assertTrue(not comments.exists())
 
 
 class TagTest(TestCase):
