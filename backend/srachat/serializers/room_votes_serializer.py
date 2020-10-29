@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
-from ..models.room import RoomVotes
+from ..models.room import RoomVote
 
 
 class RoomVotesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = RoomVotes
+        model = RoomVote
         fields = '__all__'
