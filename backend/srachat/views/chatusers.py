@@ -1,8 +1,8 @@
 from rest_framework import generics, status, parsers
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from ..models.team_number import TeamNumber
 from ..models.user import ChatUser, Participation
@@ -10,7 +10,7 @@ from ..models.room import Room
 from ..permissions import IsAccountOwnerOrReadOnly, IsRoomAdminOrReadOnly
 from ..serializers.chatuser_serializer import ChatUserSerializer
 from ..serializers.participation_serializer import ParticipationSerializer
-from ..validators import int_validator
+from ..validators import validate_non_negative_int
 
 
 class ChatUserList(generics.ListAPIView):
@@ -31,19 +31,21 @@ class ChatUserDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ChatUserSerializer
 
 
-class RoomUserList(APIView):
+class RoomUserList(GenericAPIView):
     """
     Returns all users of a room, adds a new one or deletes a caller of the endpoint.
     """
     permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Room.objects.all()
+    serializer_class = ChatUserSerializer
 
     def get(self, request, pk, format=None):
-        room = Room.get_room_or_404(pk)
+        room = self.get_object()
         chat_user_ids = ChatUser.objects.filter(rooms=room).values_list('id', flat=True)
         return Response(chat_user_ids)
 
     def post(self, request, pk):
-        room = Room.get_room_or_404(pk)
+        room = self.get_object()
         if not room.is_active:
             return Response(
                 "You cannot become a participant in an inactive room",
@@ -66,37 +68,29 @@ class RoomUserList(APIView):
             return Response(status=status.HTTP_202_ACCEPTED)
 
     def delete(self, request, pk):
-        room = Room.get_room_or_404(pk)
+        room = self.get_object()
         chat_user = ChatUser.objects.get(user=request.user)
         room.chat_users.remove(chat_user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class RoomBannedUserList(APIView):
+class RoomBanUser(GenericAPIView):
     """
     Bans a user or retrieves all banned user for a specified room
     """
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly & IsRoomAdminOrReadOnly]
+    queryset = Room.objects.all()
 
-    def check_permission_to_ban(self, request, room):
-        if not IsRoomAdminOrReadOnly().has_object_permission(request, self, room):
-            return Response("Only admin can add users to a block list", status=status.HTTP_403_FORBIDDEN)
-
-    def validate_and_return_room_and_user_id(self, request, pk):
-        room = Room.get_room_or_404(pk)
-        self.check_permission_to_ban(request, room)
+    @staticmethod
+    def validate_and_return_user_id(request):
         if "id" not in request.data:
             raise ValidationError(detail="Id must be provided", code=400)
-        user_id = int_validator(request.data["id"])
-        return room, user_id
-
-    def get(self, request, pk, format=None):
-        room = Room.get_room_or_404(pk)
-        banned_user_ids = room.banned_users.values_list('id', flat=True)
-        return Response(banned_user_ids)
+        user_id = validate_non_negative_int(request.data["id"])
+        return user_id
 
     def post(self, request, pk):
-        room, user_id = self.validate_and_return_room_and_user_id(request, pk)
+        room = self.get_object()
+        user_id = RoomBanUser.validate_and_return_user_id(request)
         if user_id in room.admins.values_list("id", flat=True) or user_id == room.creator.id:
             return Response("Admins or a creator cannot be banned", status=status.HTTP_409_CONFLICT)
         room.chat_users.remove(user_id)
@@ -104,7 +98,8 @@ class RoomBannedUserList(APIView):
         return Response(status=status.HTTP_202_ACCEPTED)
 
     def delete(self, request, pk):
-        room, user_id = self.validate_and_return_room_and_user_id(request, pk)
+        room = self.get_object()
+        user_id = RoomBanUser.validate_and_return_user_id(request)
         if user_id in room.banned_users.values_list("id", flat=True):
             room.banned_users.remove(user_id)
         else:

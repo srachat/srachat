@@ -71,7 +71,7 @@ class IsCommentInAllowedRoomOrReadOnly(AbstractSrachatReadOnlyPermission):
 
     @staticmethod
     def get_condition(request, view, obj) -> bool:
-        room = obj.room
+        room = obj
         user = ChatUser.objects.get(user=request.user)
         if user in room.banned_users.all() and user not in room.admins.all() and user is not room.creator:
             return False

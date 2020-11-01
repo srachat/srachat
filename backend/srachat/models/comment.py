@@ -7,9 +7,7 @@ from .team_number import TeamNumber
 class Comment(models.Model):
     body = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
-    creator = models.ForeignKey(
-        "ChatUser", null=True, on_delete=models.CASCADE, related_name="created_comment"
-    )
+    creator = models.ForeignKey("ChatUser", on_delete=models.CASCADE, related_name="created_comment")
     room = models.ForeignKey("Room", on_delete=models.CASCADE, related_name='comments')
     team_number = models.PositiveSmallIntegerField(choices=TeamNumber.choices)
 

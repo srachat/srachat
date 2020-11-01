@@ -9,6 +9,9 @@ from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
 
+# TODO: unify all data classes
+
+
 @dataclass
 class TestUser:
     username: str
@@ -105,10 +108,13 @@ class UrlUtils:
 
     @dataclass
     class Rooms:
+        BAN = "ban_user"
         COMMENTS = "room_comments"
+        DEACTIVATE = "deactivate_room"
         DETAILS = "room_details"
         LIST = "list_rooms"
         USERS = "list_room_users"
+        VOTE = "vote_team"
 
     @dataclass
     class Comments:
@@ -145,13 +151,3 @@ class SrachatTestCase(APITestCase):
 
     def set_credentials(self, token: str):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
-
-    def create_comment_get_response(self, room_id: int) -> Response:
-        url = reverse(UrlUtils.Rooms.COMMENTS, args=[room_id])
-        return self.client.post(url, data=CommentUtils.DATA_COMMENT_FIRST)
-
-    def create_and_assert_comment_get_response(self, room_id: int) -> Response:
-        response = self.create_comment_get_response(room_id)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        return response

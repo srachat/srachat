@@ -509,6 +509,7 @@ class CommentTest(TestCase):
 
 
 class TagTest(TestCase):
+    # TODO: add some content tests
     def test_fetch_tags(self):
         tags = Tag.objects.all()
         self.assertTrue(len(tags) > 0)

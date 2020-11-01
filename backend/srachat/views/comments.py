@@ -1,4 +1,5 @@
 from rest_framework import status, generics
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -33,15 +34,18 @@ class CommentList(generics.GenericAPIView):
             )
 
         comment_creator = ChatUser.objects.get(user=request.user)
-        if comment_creator in room.banned_users.all():
-            return Response("You are banned in this room", status=status.HTTP_403_FORBIDDEN)
+        comment_body = request.data.get("body", "")
+        if not comment_body:
+            raise ValidationError("You have to specify the comment body and it cannot be empty.")
 
-        serializer = SingleRoomCommentSerializer(data=request.data)
+        data = {
+            "body": comment_body,
+            "creator": comment_creator.id,
+            "team_number": Participation.objects.get(chatuser=comment_creator, room=room).team_number
+        }
+        serializer = SingleRoomCommentSerializer(data=data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(
-            room=room, creator=comment_creator,
-            team_number=Participation.objects.get(chatuser=comment_creator, room=room).team_number
-        )
+        serializer.save(room=room)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

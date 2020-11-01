@@ -21,10 +21,10 @@ class Room(models.Model):
 
     # Parameters with different permissions on creation
     REQUIRED_FIELDS = ["tags", "title", "first_team_name", "second_team_name"]
-    ALLOWED_TO_SPECIFY_FIELDS = ["admins", "language", "max_participants_in_team", "banned_users", "image"]
+    ALLOWED_TO_SPECIFY_FIELDS = ["admins", "language", "max_participants_in_team", "image"]
 
     MODIFIABLE_FIELD = REQUIRED_FIELDS + ALLOWED_TO_SPECIFY_FIELDS
-    UNMODIFIABLE_FIELDS = ["created", "creator", "first_team_votes", "second_team_votes", "is_active"]
+    UNMODIFIABLE_FIELDS = ["banned_users", "created", "creator", "first_team_votes", "second_team_votes", "is_active"]
 
     # Parameters, which should be specified on creation
     tags = models.ManyToManyField(Tag, related_name="rooms")
@@ -72,6 +72,9 @@ class RoomVote(models.Model):
 
     # This one is added for possible statistics
     date_voted = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Voter: {self.voter}, Room: {self.room}, Team number: {self.team_number}, Voted: {self.date_voted}"
 
     class Meta:
         unique_together = ("voter", "room")

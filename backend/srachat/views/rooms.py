@@ -1,9 +1,10 @@
 from typing import Type
 
 from rest_framework import generics, status, mixins, serializers
+from rest_framework.exceptions import NotAcceptable, ValidationError
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from ..models.team_number import TeamNumber
@@ -64,7 +65,7 @@ class RoomDetail(mixins.RetrieveModelMixin,
             return DetailListRoomSerializer
 
 
-class RoomVoteTeam(APIView):
+class RoomVoteTeam(GenericAPIView):
     """
     View to let users vote for a team in a room
 
@@ -88,9 +89,10 @@ class RoomVoteTeam(APIView):
     # TODO: rewrite adding a vote to a room model as an action to a RoomVotes object
     """
     permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Room.objects.all()
 
     @staticmethod
-    def _handle_vote(team_number: int, room: Room, previously_voted_object: RoomVote):
+    def _handle_repeating_vote(team_number: int, room: Room, previously_voted_object: RoomVote):
         if team_number == 1:
             room.first_team_votes += 1
             room.second_team_votes -= 1
@@ -102,17 +104,16 @@ class RoomVoteTeam(APIView):
                 room.first_team_votes -= 1
             elif previously_voted_object.team_number == 2:
                 room.second_team_votes -= 1
+            else:
+                raise NotAcceptable("You cannot revoke the vote, since you have already done it previously.")
         else:
-            return Response(
-                "You can choose either 1 or 2 to vote for a team, or 0 to revoke the vote",
-                status=status.HTTP_406_NOT_ACCEPTABLE
-            )
+            raise ValidationError("You can choose either 1 or 2 to vote for a team, or 0 to revoke the vote")
         room.save()
         previously_voted_object.team_number = team_number
         previously_voted_object.save()
 
     def post(self, request, pk):
-        room = Room.get_room_or_404(pk)
+        room = self.get_object()
         if not room.is_active:
             return Response("You cannot vote in an inactive room", status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS)
         user = request.user
@@ -125,12 +126,12 @@ class RoomVoteTeam(APIView):
         if already_voted_for_team:
             return Response("You have already voted for this team", status=status.HTTP_406_NOT_ACCEPTABLE)
 
-        serializer = RoomVotesSerializer(data=dict(voter=user.id, room=room, team_number=team_number))
-        serializer.is_valid(raise_exception=True)
         previously_voted_object = previously_voted.first()
-        if previously_voted.exists() and previously_voted_object.team_number != 0:
-            RoomVoteTeam._handle_vote(team_number, room, previously_voted_object)
+        if previously_voted.exists():
+            RoomVoteTeam._handle_repeating_vote(team_number, room, previously_voted_object)
         else:
+            serializer = RoomVotesSerializer(data=dict(voter=user.id, room=room.id, team_number=team_number))
+            serializer.is_valid(raise_exception=True)
             if team_number == 1:
                 room.first_team_votes += 1
             elif team_number == 2:
@@ -143,4 +144,19 @@ class RoomVoteTeam(APIView):
             serializer.save()
             room.save()
 
+        return Response(status=status.HTTP_202_ACCEPTED)
+
+
+class RoomDeactivate(GenericAPIView):
+    """
+    View to set the room into the deactivated state.
+    Only a room creator can do that.
+    """
+    permission_classes = [IsAuthenticatedOrReadOnly & IsCreatorOrReadOnly]
+    queryset = Room.objects.all()
+
+    def post(self, request, pk):
+        room = self.get_object()
+        room.is_active = False
+        room.save()
         return Response(status=status.HTTP_202_ACCEPTED)
