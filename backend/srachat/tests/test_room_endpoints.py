@@ -665,3 +665,11 @@ class RoomTest(SrachatTestCase):
         self._vote_for_team_and_check(
             status.HTTP_202_ACCEPTED, self.auth_token_first, 1, 3, status.HTTP_400_BAD_REQUEST
         )
+
+    def test_room_vote_revoke_vote(self):
+        post_response = self.client.post(self.url_vote, data={"team_number": 2}, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_202_ACCEPTED)
+        post_response = self.client.post(self.url_vote, data={"team_number": 0}, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_202_ACCEPTED)
+        post_response = self.client.post(self.url_vote, data={"team_number": 1}, format="json")
+        self.assertEqual(post_response.status_code, status.HTTP_202_ACCEPTED)

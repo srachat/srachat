@@ -93,21 +93,22 @@ class RoomVoteTeam(GenericAPIView):
 
     @staticmethod
     def _handle_repeating_vote(team_number: int, room: Room, previously_voted_object: RoomVote):
-        if team_number == 1:
-            room.first_team_votes += 1
-            room.second_team_votes -= 1
-        elif team_number == 2:
-            room.second_team_votes += 1
-            room.first_team_votes -= 1
-        elif team_number == 0:
-            if previously_voted_object.team_number == 1:
-                room.first_team_votes -= 1
-            elif previously_voted_object.team_number == 2:
-                room.second_team_votes -= 1
-            else:
-                raise NotAcceptable("You cannot revoke the vote, since you have already done it previously.")
-        else:
+        if team_number not in (0, 1, 2):
             raise ValidationError("You can choose either 1 or 2 to vote for a team, or 0 to revoke the vote")
+
+        if previously_voted_object.team_number == 0:
+            if team_number == 1:
+                room.first_team_votes += 1
+            elif team_number == 2:
+                room.second_team_votes += 1
+        elif previously_voted_object.team_number == 1:
+            room.first_team_votes -= 1
+            if team_number == 2:
+                room.second_team_votes += 1
+        elif previously_voted_object.team_number == 2:
+            room.second_team_votes -= 1
+            if team_number == 1:
+                room.first_team_votes += 1
         room.save()
         previously_voted_object.team_number = team_number
         previously_voted_object.save()
