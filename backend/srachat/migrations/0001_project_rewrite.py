@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
                 ('image', models.ImageField(blank=True, null=True, upload_to='images')),
                 ('admins', models.ManyToManyField(default=[], related_name='administrated_rooms', to='srachat.ChatUser')),
                 ('banned_users', models.ManyToManyField(blank=True, related_name='forbidden_rooms', to='srachat.ChatUser')),
-                ('creator', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='created_room', to='srachat.chatuser')),
+                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='created_room', to='srachat.chatuser')),
                 ('tags', models.ManyToManyField(related_name='rooms', to='srachat.Tag')),
             ],
         ),

@@ -40,7 +40,7 @@ class Room(models.Model):
     is_active = models.BooleanField(default=True)
     # ... and even modified
     created = models.DateTimeField(auto_now=True)
-    creator = models.ForeignKey("ChatUser", null=True, on_delete=models.CASCADE, related_name="created_room")
+    creator = models.ForeignKey("ChatUser", on_delete=models.CASCADE, related_name="created_room")
 
     # Parameters, which may be specified
     # Admins should be filled with the same value as a creator
