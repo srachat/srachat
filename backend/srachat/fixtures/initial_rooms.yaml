@@ -4,16 +4,25 @@
   fields:
     title: "first room of the first user"
     creator_id: 2
+    created: "2020-10-10 22:15:00+00:00"
+    first_team_name: "first room first team"
+    second_team_name: "first room first team"
 - model: srachat.room
   pk: 2
   fields:
     title: "second room of the first user"
     creator_id: 2
+    created: "2020-10-10 22:25:00+00:00"
+    first_team_name: "second room first team"
+    second_team_name: "second room first team"
 - model: srachat.room
   pk: 3
   fields:
     title: "the only room of the second user"
     creator_id: 3
+    created: "2020-10-10 22:35:00+00:00"
+    first_team_name: "third room first team"
+    second_team_name: "third room first team"
 
 # adding admins to rooms
 - model: srachat.room_admins
@@ -80,43 +89,51 @@
     tag_id: 5
 
 # filling the rooms with users
-- model: srachat.chatuser_rooms
+- model: srachat.participation
   pk: 1
   fields:
     room_id: 1
     chatuser_id: 2
-- model: srachat.chatuser_rooms
+    team_number: 1
+- model: srachat.participation
   pk: 2
   fields:
     room_id: 1
     chatuser_id: 3
-- model: srachat.chatuser_rooms
+    team_number: 1
+- model: srachat.participation
   pk: 3
   fields:
     room_id: 1
     chatuser_id: 5
-- model: srachat.chatuser_rooms
+    team_number: 2
+- model: srachat.participation
   pk: 4
   fields:
     room_id: 2
     chatuser_id: 2
-- model: srachat.chatuser_rooms
+    team_number: 1
+- model: srachat.participation
   pk: 5
   fields:
     room_id: 2
     chatuser_id: 4
-- model: srachat.chatuser_rooms
+    team_number: 2
+- model: srachat.participation
   pk: 6
   fields:
     room_id: 3
     chatuser_id: 2
-- model: srachat.chatuser_rooms
+    team_number: 1
+- model: srachat.participation
   pk: 7
   fields:
     room_id: 3
     chatuser_id: 3
-- model: srachat.chatuser_rooms
+    team_number: 2
+- model: srachat.participation
   pk: 8
   fields:
     room_id: 3
     chatuser_id: 4
+    team_number: 2

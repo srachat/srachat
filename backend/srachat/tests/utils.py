@@ -1,11 +1,15 @@
+from collections import namedtuple
 from dataclasses import asdict, dataclass
-from typing import Dict
+from typing import Any, Dict, List
 
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
+
+
+# TODO: unify all data classes
 
 
 @dataclass
@@ -20,6 +24,11 @@ class TestUser:
         test_user_dict = asdict(self)
         test_user_dict["password2"] = self.password1
         return test_user_dict
+
+
+@dataclass
+class TestComment:
+    body: str
 
 
 @dataclass
@@ -46,9 +55,15 @@ class UserUtils:
 
 @dataclass
 class CommentUtils:
-    DATA_COMMENT_FIRST = {
-        "body": "this is comment"
-    }
+    COMMENT_FIRST = "this is the first comment"
+    COMMENT_SECOND = "this is the second comment"
+    COMMENT_THIRD = "this is the third comment"
+    COMMENT_FOURTH = "this is the fourth comment"
+
+    DATA_COMMENT_FIRST = asdict(TestComment(COMMENT_FIRST))
+    DATA_COMMENT_SECOND = asdict(TestComment(COMMENT_SECOND))
+    DATA_COMMENT_THIRD = asdict(TestComment(COMMENT_THIRD))
+    DATA_COMMENT_FOURTH = asdict(TestComment(COMMENT_FOURTH))
 
 
 @dataclass
@@ -57,14 +72,31 @@ class RoomUtils:
     ROOM_NAME_FIRST = ROOM_NAME + "1"
     ROOM_NAME_SECOND = ROOM_NAME + "2"
 
-    DATA_ROOM_FIRST = {
-        "title": ROOM_NAME_FIRST,
-        "tags": [1, 2, 3]
-    }
-    DATA_ROOM_SECOND = {
-        "title": ROOM_NAME_SECOND,
-        "tags": [1, 2, 3]
-    }
+    RoomData = namedtuple("RoomData", ("title", "tags", "first_team_name", "second_team_name"))
+    FIELDS = set(RoomData._fields)
+
+    DATA_ROOM_FIRST = RoomData(
+        title=ROOM_NAME_FIRST, tags=[1, 2, 3],
+        first_team_name="first room first team", second_team_name="first room second team",
+    )
+    DATA_ROOM_SECOND = RoomData(
+        title=ROOM_NAME_SECOND, tags=[1, 2, 3, 4],
+        first_team_name="second room first team", second_team_name="second room second team",
+    )
+
+    @staticmethod
+    def get_room_data_without_fields(data: RoomData, excluded_fields: List[str]) -> Dict[str, Any]:
+        result_fields = RoomUtils.FIELDS.difference(excluded_fields)
+        return {
+            field_name: getattr(data, field_name)
+            for field_name in result_fields
+        }
+
+    @staticmethod
+    def get_room_data_with_extra_field(data: RoomData, key: str, value: Any) -> Dict[str, Any]:
+        new_data = data._asdict().copy()
+        new_data[key] = value
+        return new_data
 
 
 class UrlUtils:
@@ -76,10 +108,13 @@ class UrlUtils:
 
     @dataclass
     class Rooms:
+        BAN = "ban_user"
         COMMENTS = "room_comments"
+        DEACTIVATE = "deactivate_room"
         DETAILS = "room_details"
         LIST = "list_rooms"
         USERS = "list_room_users"
+        VOTE = "vote_team"
 
     @dataclass
     class Comments:
@@ -116,13 +151,3 @@ class SrachatTestCase(APITestCase):
 
     def set_credentials(self, token: str):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
-
-    def create_comment_get_response(self, room_id: int) -> Response:
-        url = reverse(UrlUtils.Rooms.COMMENTS, args=[room_id])
-        return self.client.post(url, data=CommentUtils.DATA_COMMENT_FIRST)
-
-    def create_and_assert_comment_get_response(self, room_id: int) -> Response:
-        response = self.create_comment_get_response(room_id)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        return response
