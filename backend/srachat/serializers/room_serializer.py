@@ -59,4 +59,4 @@ class DetailListRoomSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_tags(self, obj):
-        return Tag.objects.filter(pk__in=obj.tags.all()).values_list("name", flat=True)
+        return Tag.get_names_by_ids(obj.tags.all())

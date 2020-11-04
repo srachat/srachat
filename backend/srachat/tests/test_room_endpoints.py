@@ -8,6 +8,7 @@ from rest_framework import status
 from ..models import ChatUser
 from ..models.language import LanguageChoices
 from ..models.room import Room, RoomVote
+from ..models.tag import Tag
 from ..tests.utils import UserUtils, RoomUtils, UrlUtils, SrachatTestCase
 
 # TODO: expand the documentation
@@ -198,7 +199,7 @@ class RoomTest(SrachatTestCase):
         self.assertEqual(data["is_active"], True)
         self.assertEqual(data["language"], LanguageChoices.RUSSIAN)
         self.assertEqual(data["max_participants_in_team"], Room.DEFAULT_MAX_PARTICIPANTS)
-        self.assertCountEqual(data["tags"], RoomUtils.DATA_ROOM_FIRST.tags)
+        self.assertCountEqual(data["tags"], Tag.get_names_by_ids(RoomUtils.DATA_ROOM_FIRST.tags))
         self.assertCountEqual(data["admins"], [1, 2])
         self.assertCountEqual(data["banned_users"], [])
 
@@ -261,6 +262,14 @@ class RoomTest(SrachatTestCase):
             auth_token: Optional[str] = None,
             additional_fields: Optional[Dict[str, Any]] = None
     ):
+        def compare_dicts(first_dict: Dict[str, Any], second_dict: Dict[str, Any]):
+            self.assertCountEqual(first_dict.keys(), second_dict.keys())
+            for key in first_dict.keys():
+                if key == "tags":
+                    self.assertCountEqual(list(first_dict[key]), list(second_dict[key]))
+                else:
+                    self.assertEqual(first_dict[key], second_dict[key])
+
         additional_fields = additional_fields or {}
 
         if auth_token:
@@ -270,7 +279,7 @@ class RoomTest(SrachatTestCase):
 
         # Verify that before the action all data remain same as after the creation
         before_data = self.client.get(self.url_info).data
-        self.assertDictEqual(before_data, self.first_room_data)
+        compare_dicts(before_data, self.first_room_data)
 
         updated_title = "updated_title"
         updated_tags = [1, 2]
@@ -309,13 +318,13 @@ class RoomTest(SrachatTestCase):
             self.assertEqual(after_data["creator"], 1)
             self.assertEqual(after_data["language"], updated_language)
             self.assertEqual(after_data["max_participants_in_team"], updated_max_participants)
-            self.assertCountEqual(after_data["tags"], updated_tags)
+            self.assertCountEqual(after_data["tags"], Tag.get_names_by_ids(updated_tags))
             self.assertCountEqual(after_data["admins"], updated_admins)
             self.assertEqual(after_data["first_team_name"], updated_first_team_name)
             self.assertEqual(after_data["second_team_name"], updated_second_team_name)
         else:
             # If operation was not successful, check that data remains the same as after creation
-            self.assertDictEqual(after_data, self.first_room_data)
+            compare_dicts(after_data, self.first_room_data)
 
     def _perform_both_update_actions(
             self,
@@ -673,3 +682,11 @@ class RoomTest(SrachatTestCase):
         self.assertEqual(post_response.status_code, status.HTTP_202_ACCEPTED)
         post_response = self.client.post(self.url_vote, data={"team_number": 1}, format="json")
         self.assertEqual(post_response.status_code, status.HTTP_202_ACCEPTED)
+
+    def test_room_detail_tags_as_strings(self):
+        """
+            GET: '/pidor/rooms/{id}/
+        """
+
+        tags = self.client.get(self.url_info).data["tags"]
+        self.assertTrue(all(map(lambda tag: isinstance(tag, str), tags)))
