@@ -52,6 +52,11 @@ class UpdateRoomSerializer(CreateUpdateRoomSerializer):
 
 
 class DetailListRoomSerializer(serializers.ModelSerializer):
+    tags = serializers.SerializerMethodField()
+
     class Meta:
         model = Room
         fields = '__all__'
+
+    def get_tags(self, obj):
+        return Tag.objects.filter(pk__in=obj.tags.all()).values_list("name", flat=True)
