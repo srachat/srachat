@@ -185,3 +185,30 @@ class CommentTests(SrachatTestCase):
         """
 
         self._try_post_comment_check(status.HTTP_403_FORBIDDEN, self.url_first_room_comments, self.auth_token_third ,{})
+
+    def test_update_comment_info_by_creator_allowed_fields(self):
+        """
+            PATCH, PUT: 'comments/<int:pk>/'
+        """
+        """
+        # Authorization
+        self.set_credentials(self.auth_token_first)
+        
+        # Create a new comment
+        post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+
+        # Update allowed fields in the comment
+        patch_response = self.client.patch(reverse(UrlUtils.Comments.DETAILS, args=[1]),
+                                           data={"body": CommentUtils.DATA_COMMENT_SECOND},
+                                           format="json")
+        print(patch_response.data)
+        self.assertEqual(patch_response.status_code, status.HTTP_201_CREATED)
+        """
+        pass
+
+    def test_update_comment_info_by_creator_not_allowed_fields(self):
+        """
+            PATCH, PUT: 'comments/<int:pk>/'
+        """
+        pass
