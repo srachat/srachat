@@ -44,6 +44,7 @@ class CommentTests(SrachatTestCase):
         self.url_second_room_users = reverse(UrlUtils.Rooms.USERS, args=[2])
         self.url_first_room_comments = reverse(UrlUtils.Rooms.COMMENTS, args=[1])
         self.url_second_room_comments = reverse(UrlUtils.Rooms.COMMENTS, args=[2])
+        self.url_first_comment = reverse(UrlUtils.Comments.DETAILS, args=[1])
 
         # First user creates a room and becomes a participant of the first team
         self.set_credentials(self.auth_token_first)
@@ -190,7 +191,7 @@ class CommentTests(SrachatTestCase):
         """
             PATCH, PUT: 'comments/<int:pk>/'
         """
-        """
+
         # Authorization
         self.set_credentials(self.auth_token_first)
         
@@ -206,10 +207,9 @@ class CommentTests(SrachatTestCase):
         self.assertEqual(patch_response.status_code, status.HTTP_201_CREATED)
         
         # Check update of the body comment
-        response_get = self.client.get(self.url_first_room_comments)
-        data = response_get.data[0]
-        self.assertEqual(data["body"], CommentUtils.DATA_COMMENT_SECOND["body"])
-        """
+        data = self.client.get(self.url_first_comment).data
+        self.assertEqual(data["body"], CommentUtils.COMMENT_SECOND)
+
         pass
 
     def test_update_comment_info_by_creator_not_allowed_fields(self):
