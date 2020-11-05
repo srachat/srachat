@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+from .models import Room
 from .models.user import ChatUser
 
 
@@ -64,14 +65,20 @@ class IsAccountOwnerOrReadOnly(AbstractSrachatReadOnlyPermission):
         return obj.user == request.user
 
 
-class IsCommentInAllowedRoomOrReadOnly(AbstractSrachatReadOnlyPermission):
+class IsAllowedRoomOrReadOnly(AbstractSrachatReadOnlyPermission):
     """
-    Custom permission to check whether the comment is in the room, which is forbidden for a user
+    Custom permission to check whether user is performing action in an allowed room
     """
 
     @staticmethod
     def get_condition(request, view, obj) -> bool:
-        room = obj
+        if isinstance(obj, Room):
+            room = obj
+        elif hasattr(obj, "room"):
+            room = obj.room
+        else:
+            raise ValueError("Object should either be of type Room or any type, which is bound to room.")
+
         user = ChatUser.objects.get(user=request.user)
         if user in room.banned_users.all() and user not in room.admins.all() and user is not room.creator:
             return False
