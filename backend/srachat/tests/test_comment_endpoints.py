@@ -204,6 +204,11 @@ class CommentTests(SrachatTestCase):
                                            format="json")
         print(patch_response.data)
         self.assertEqual(patch_response.status_code, status.HTTP_201_CREATED)
+        
+        # Check update of the body comment
+        response_get = self.client.get(self.url_first_room_comments)
+        data = response_get.data[0]
+        self.assertEqual(data["body"], CommentUtils.DATA_COMMENT_SECOND["body"])
         """
         pass
 
