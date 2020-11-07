@@ -201,10 +201,10 @@ class CommentTests(SrachatTestCase):
 
         # Partial update allowed fields in the comment
         patch_response = self.client.patch(reverse(UrlUtils.Comments.DETAILS, args=[1]),
-                                           data={"body": CommentUtils.DATA_COMMENT_SECOND},
+                                           data={"body": CommentUtils.COMMENT_SECOND},
                                            format="json")
         print(patch_response.data)
-        self.assertEqual(patch_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
 
         # Check partial update of the body comment
         data = self.client.get(self.url_first_comment).data
@@ -212,10 +212,10 @@ class CommentTests(SrachatTestCase):
 
         # Update allowed fields in the comment
         put_response = self.client.put(reverse(UrlUtils.Comments.DETAILS, args=[1]),
-                                       data={"body": CommentUtils.DATA_COMMENT_FIRST},
+                                       data={"body": CommentUtils.COMMENT_FIRST},
                                        format="json")
         print(put_response.data)
-        self.assertEqual(put_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(put_response.status_code, status.HTTP_200_OK)
 
         # Check update of the body comment
         data = self.client.get(self.url_first_comment).data
