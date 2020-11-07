@@ -251,7 +251,6 @@ class CommentTests(SrachatTestCase):
                                        format="json")
 
         self.assertEqual(put_response.status_code, status_code)
-
         # Check update of the not allowed field
         data = self.client.get(self.url_first_comment).data
         self.assertEqual(data[field], field_value_default)
