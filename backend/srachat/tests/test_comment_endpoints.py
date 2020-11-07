@@ -203,7 +203,7 @@ class CommentTests(SrachatTestCase):
         patch_response = self.client.patch(reverse(UrlUtils.Comments.DETAILS, args=[1]),
                                            data={"body": CommentUtils.COMMENT_SECOND},
                                            format="json")
-        print(patch_response.data)
+
         self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
 
         # Check partial update of the body comment
@@ -214,14 +214,12 @@ class CommentTests(SrachatTestCase):
         put_response = self.client.put(reverse(UrlUtils.Comments.DETAILS, args=[1]),
                                        data={"body": CommentUtils.COMMENT_FIRST},
                                        format="json")
-        print(put_response.data)
+
         self.assertEqual(put_response.status_code, status.HTTP_200_OK)
 
         # Check update of the body comment
         data = self.client.get(self.url_first_comment).data
         self.assertEqual(data["body"], CommentUtils.COMMENT_FIRST)
-
-        pass
 
     def test_update_comment_info_by_creator_not_allowed_fields(self):
         """
@@ -235,16 +233,24 @@ class CommentTests(SrachatTestCase):
         post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
 
-        # Partial update allowed fields in the comment
+        #  Try to partial update not allowed fields in the comment
         patch_response = self.client.patch(reverse(UrlUtils.Comments.DETAILS, args=[1]),
-                                           data={"room": 100},
+                                           data={"creator": 2},
                                            format="json")
-        print(patch_response.data)
-        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
 
-        # Check partial update of the body comment
+        self.assertEqual(patch_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Check partial update of the not allowed field
         data = self.client.get(self.url_first_comment).data
         self.assertEqual(data["creator"], 1)
 
+        # Try to update not allowed fields in the comment
+        put_response = self.client.put(reverse(UrlUtils.Comments.DETAILS, args=[1]),
+                                       data={"creator": 2},
+                                       format="json")
 
-        pass
+        self.assertEqual(put_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Check update of the not allowed field
+        data = self.client.get(self.url_first_comment).data
+        self.assertEqual(data["creator"], 1)
