@@ -221,8 +221,12 @@ class CommentTests(SrachatTestCase):
         data = self.client.get(self.url_first_comment).data
         self.assertEqual(data["body"], CommentUtils.COMMENT_FIRST)
 
-    def _try_update_comment_unsuccessful(self, status_code: int, field: str,
-                                         field_value: [str, int], field_value_default: [str, int],):
+    def _try_update_comment_unsuccessful(self,
+                                         status_code: int,
+                                         field: str,
+                                         field_value: [str, int],
+                                         field_value_default: [str, int]
+                                         ):
         """
             PATCH, PUT: 'comments/<int:pk>/'
         """
@@ -275,3 +279,38 @@ class CommentTests(SrachatTestCase):
         """
         self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST,
                                               field="team_number", field_value=2, field_value_default=1)
+
+    def test_update_comment_info_by_creator_not_allowed_field_created(self):
+        """
+            PATCH, PUT: 'comments/<int:pk>/'
+        """
+
+        # Authorization
+        self.set_credentials(self.auth_token_first)
+
+        # Create a new comment
+        post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+
+        time_now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        #  Try to partial update not allowed fields in the comment
+        patch_response = self.client.patch(reverse(UrlUtils.Comments.DETAILS, args=[1]),
+                                           data={"created": time_now},
+                                           format="json")
+
+        self.assertEqual(patch_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Check partial update of the not allowed field
+        data = self.client.get(self.url_first_comment).data
+        self.assertNotEqual(data["created"], time_now)
+
+        # Try to update not allowed fields in the comment
+        time_now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        put_response = self.client.put(reverse(UrlUtils.Comments.DETAILS, args=[1]),
+                                       data={"created": time_now},
+                                       format="json")
+
+        self.assertEqual(put_response.status_code, status.HTTP_400_BAD_REQUEST)
+        # Check update of the not allowed field
+        data = self.client.get(self.url_first_comment).data
+        self.assertNotEqual(data["created"], time_now)
