@@ -185,7 +185,7 @@ class CommentTests(SrachatTestCase):
             POST: '/pidor/rooms/{id}/comments/
         """
 
-        self._try_post_comment_check(status.HTTP_403_FORBIDDEN, self.url_first_room_comments, self.auth_token_third ,{})
+        self._try_post_comment_check(status.HTTP_403_FORBIDDEN, self.url_first_room_comments, self.auth_token_third, {})
 
     def test_update_comment_info_by_creator_allowed_fields(self):
         """
@@ -194,21 +194,32 @@ class CommentTests(SrachatTestCase):
 
         # Authorization
         self.set_credentials(self.auth_token_first)
-        
+
         # Create a new comment
         post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
 
-        # Update allowed fields in the comment
+        # Partial update allowed fields in the comment
         patch_response = self.client.patch(reverse(UrlUtils.Comments.DETAILS, args=[1]),
                                            data={"body": CommentUtils.DATA_COMMENT_SECOND},
                                            format="json")
         print(patch_response.data)
         self.assertEqual(patch_response.status_code, status.HTTP_201_CREATED)
-        
-        # Check update of the body comment
+
+        # Check partial update of the body comment
         data = self.client.get(self.url_first_comment).data
         self.assertEqual(data["body"], CommentUtils.COMMENT_SECOND)
+
+        # Update allowed fields in the comment
+        put_response = self.client.put(reverse(UrlUtils.Comments.DETAILS, args=[1]),
+                                       data={"body": CommentUtils.DATA_COMMENT_FIRST},
+                                       format="json")
+        print(put_response.data)
+        self.assertEqual(put_response.status_code, status.HTTP_201_CREATED)
+
+        # Check update of the body comment
+        data = self.client.get(self.url_first_comment).data
+        self.assertEqual(data["body"], CommentUtils.COMMENT_FIRST)
 
         pass
 
