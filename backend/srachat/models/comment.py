@@ -5,6 +5,7 @@ from .team_number import TeamNumber
 
 
 class Comment(models.Model):
+    MODIFIABLE_FIELD = ["body"]
     body = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey("ChatUser", on_delete=models.CASCADE, related_name="created_comment")

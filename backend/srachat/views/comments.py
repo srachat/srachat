@@ -1,13 +1,16 @@
-from rest_framework import status, generics
+from typing import Type
+
+from rest_framework import status, generics, mixins, serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from ..models.comment import Comment
-from ..models.user import ChatUser, Participation
 from ..models.room import Room
+from ..models.user import ChatUser, Participation
 from ..permissions import IsCreatorOrReadOnly, IsRoomParticipantOrReadOnly, IsAllowedRoomOrReadOnly
-from ..serializers.comment_serializer import CommentSerializer, SingleRoomCommentSerializer
+from ..serializers.comment_serializer import CommentSerializer, SingleRoomCommentSerializer, UpdateCommentSerializer
 
 
 class CommentList(generics.GenericAPIView):
@@ -49,10 +52,32 @@ class CommentList(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
+class CommentDetail(mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    GenericViewSet):
     """
-    This view is able to display, update and delete a single comment.
+        This view is able to display, update and delete a single room.
+        # TODO: extend the documentation. Describe all permissions.
     """
     permission_classes = [IsAuthenticatedOrReadOnly & IsCreatorOrReadOnly & IsAllowedRoomOrReadOnly]
     queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
+    default_actions = {
+        "get": "retrieve",
+        "put": "update",
+        "patch": "partial_update",
+        "delete": "destroy"
+    }
+
+    @classmethod
+    def as_view(cls, **kwargs):
+        actions = kwargs.get("actions", None)
+        if not actions:
+            actions = cls.default_actions
+        return super().as_view(actions=actions, **kwargs)
+
+    def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
+        if self.action in ("update", "partial_update"):
+            return UpdateCommentSerializer
+        else:
+            return CommentSerializer

@@ -227,4 +227,24 @@ class CommentTests(SrachatTestCase):
         """
             PATCH, PUT: 'comments/<int:pk>/'
         """
+
+        # Authorization
+        self.set_credentials(self.auth_token_first)
+
+        # Create a new comment
+        post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+
+        # Partial update allowed fields in the comment
+        patch_response = self.client.patch(reverse(UrlUtils.Comments.DETAILS, args=[1]),
+                                           data={"room": 100},
+                                           format="json")
+        print(patch_response.data)
+        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
+
+        # Check partial update of the body comment
+        data = self.client.get(self.url_first_comment).data
+        self.assertEqual(data["creator"], 1)
+
+
         pass
