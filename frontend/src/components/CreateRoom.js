@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {FormDropDown, FormInput, TagSelector} from "./Input";
+import {FormInput, TagSelector} from "./Input";
 import axios from "axios";
 
 class CreateRoom extends Component {
@@ -12,7 +12,6 @@ class CreateRoom extends Component {
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
     }
 
     getData(event) {
@@ -39,12 +38,6 @@ class CreateRoom extends Component {
             .catch(err => console.log(err));
     }
 
-    handleChange(event) {
-        let name = event.target.name;
-        let value = event.target.value;
-        this.setState({[name]: value});
-    }
-
     render() {
         return (
             <div className="create-room">
@@ -53,7 +46,6 @@ class CreateRoom extends Component {
                     <FormInput
                         label="Select a name for your room"
                         name="title"
-                        onChange={this.handleChange}
                         placeholder="Room name"
                         required={true}
                     />
@@ -61,7 +53,6 @@ class CreateRoom extends Component {
                     <FormInput
                         label="How many participants can be in each team (max 50)"
                         name="max_participants_in_team"
-                        onChange={this.handleChange}
                         placeholder="Default 15"
                         type="number"
                     />
@@ -73,14 +64,12 @@ class CreateRoom extends Component {
                     <FormInput
                         label="Select a name for the red team"
                         name="first_team_name"
-                        onChange={this.handleChange}
                         placeholder="Red team name"
                         required={true}
                     />
                     <FormInput
                         label="Select a name for the green team"
                         name="second_team_name"
-                        onChange={this.handleChange}
                         placeholder="Green team name"
                         required={true}
                     />

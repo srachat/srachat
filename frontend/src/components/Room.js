@@ -3,7 +3,6 @@ import React, {Component} from "react";
 import axios from "axios";
 import Comments from "./Comments";
 import Cookies from "js-cookie";
-import {FormInput} from "./Input";
 
 
 type RoomData = {
@@ -28,7 +27,7 @@ class Room extends Component {
 		this.id = props.match.params.id;
 		this.roomUrl = `/pidor/rooms/${this.id}/`;
 		this.state = { userState: { isCreator: false, isParticipant: false } };
-		this.currentUserId = parseInt(localStorage.getItem("id")) || -1;
+		this.currentUserId = parseInt(localStorage.getItem("userId")) || -1;
 
 		this.deleteRoom = this.deleteRoom.bind(this);
 		this.submitMessage = this.submitMessage.bind(this);
@@ -101,7 +100,7 @@ class Room extends Component {
                     />
                     {this.state.userState.isCreator && <button className="room-delete" onClick={this.deleteRoom}>Delete room</button> }
                 </div>
-                <Comments roomId={this.id} />
+                <Comments roomUrl={this.roomUrl} />
             {/*  Extract the footer into the separate component  */}
             <div className="room-footer">
                 {this.state.userState.isParticipant ? (
