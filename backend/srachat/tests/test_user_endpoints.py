@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, List
+from typing import Dict, Optional, List
 
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -209,6 +209,12 @@ class RoomUserTest(SrachatTestCase):
         self.url_info = reverse(UrlUtils.Rooms.DETAILS, args=[self.first_room_id])
         self.url_ban_user = reverse(UrlUtils.Rooms.BAN, args=[self.first_room_id])
 
+    def _get_room_users_combined(self, team_grouped_users: Dict[str, List[int]]):
+        result = []
+        for team_users in team_grouped_users.values():
+            result.extend(team_users)
+        return result
+
     def test_get_room_users(self):
         """
             GET: '/pidor/rooms/{id}/users/
@@ -216,7 +222,7 @@ class RoomUserTest(SrachatTestCase):
 
         response = self.client.get(self.url_users)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertCountEqual(response.data, [1])
+        self.assertCountEqual(self._get_room_users_combined(response.data), [1])
 
     def _try_join_the_team(
             self,
@@ -252,7 +258,7 @@ class RoomUserTest(SrachatTestCase):
         self.assertEqual(participations_after.count(), len(participants_after))
 
         get_response = self.client.get(self.url_users)
-        self.assertCountEqual(list(get_response.data), participants_after)
+        self.assertCountEqual(self._get_room_users_combined(get_response.data), participants_after)
 
     def test_user_joins_room_team_number_not_specified(self):
         """
