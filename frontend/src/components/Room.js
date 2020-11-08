@@ -26,13 +26,18 @@ class Room extends Component {
 		this.props = props;
 		this.id = props.match.params.id;
 		this.roomUrl = `/pidor/rooms/${this.id}/`;
-		this.state = { userState: { isCreator: false, isParticipant: false } };
+		this.state = {
+		    userState: { isCreator: false, isParticipant: false },
+            firstRoomFilled: false, secondRoomFilled: false
+        };
 		this.currentUserId = parseInt(localStorage.getItem("userId")) || -1;
 
 		this.deleteRoom = this.deleteRoom.bind(this);
+		this.fetchUsers = this.fetchUsers.bind(this);
+		this.joinTeam = this.joinTeam.bind(this);
 		this.submitMessage = this.submitMessage.bind(this);
 		this.updateCreator = this.updateCreator.bind(this);
-		this.updateParticipant = this.updateParticipant.bind(this);
+		this.updateParticipation = this.updateParticipation.bind(this);
 	}
 
 	updateCreator() {
@@ -44,12 +49,23 @@ class Room extends Component {
             })
     }
 
-    updateParticipant(participantIds) {
+    fetchUsers() {
+        return axios
+            .get(`${this.roomUrl}users/`)
+            .then(res => this.updateParticipation(res.data))
+            .catch(err => console.log(err.response.statusText))
+    }
+
+    updateParticipation(participantIds) {
+        const allParticipants = Object.values(participantIds).flat();
+        console.log(participantIds)
         this.setState({
                 userState: {
                     isCreator: this.state.userState.isCreator,
-                    isParticipant: participantIds.includes(this.currentUserId)
-                }
+                    isParticipant: allParticipants.includes(this.currentUserId)
+                },
+                firstRoomFilled: participantIds["1"].length >= this.state.max_participants_in_team,
+                secondRoomFilled: participantIds["2"].length >= this.state.max_participants_in_team,
             })
     }
 
@@ -59,10 +75,7 @@ class Room extends Component {
             .then(res => {
                 this.setState(res.data);
                 this.updateCreator();
-                return axios
-                        .get(`${this.roomUrl}users/`)
-                        .then(res => this.updateParticipant(res.data))
-                        .catch(err => console.log(err.response.statusText))
+                return this.fetchUsers();
             })
             .catch(err => this.props.history.push("/404"));
 	}
@@ -81,6 +94,15 @@ class Room extends Component {
             .post(`${this.roomUrl}comments/`, {"body": body})
             .then(() => event.target.reset())
             .catch(err => console.log(err.response.statusText));
+    }
+
+    joinTeam(event) {
+        event.preventDefault();
+        const teamNumber = parseInt(event.target.id);
+        axios
+            .post(`${this.roomUrl}users/`, {"team_number": teamNumber})
+            .then(() => this.fetchUsers())
+            .catch(err => console.log(err));
     }
 
 	render() {
@@ -108,7 +130,24 @@ class Room extends Component {
                         <input name="body" placeholder="Tell them your opinion"/>
                         <input type="submit" value="Send message" className="send-message" />
                     </form>
-                ) : Cookies.get("token") && <span>You are not a participant</span>}
+                ) : Cookies.get("token") && (
+                    <div className="team-join">
+                        <button
+                            onClick={this.joinTeam}
+                            id={1}
+                            disabled={this.state.firstRoomFilled}
+                        >
+                            Join {this.state.first_team_name}
+                        </button>
+                        <button
+                            onClick={this.joinTeam}
+                            id={2}
+                            disabled={this.state.secondRoomFilled}
+                        >
+                            Join {this.state.second_team_name}
+                        </button>
+                    </div>
+                )}
             </div>
             </div>
         );
