@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from ..models.comment import Comment
 from ..models.user import ChatUser, Participation
 from ..models.room import Room
-from ..permissions import IsCreatorOrReadOnly, IsRoomParticipantOrReadOnly, IsCommentInAllowedRoomOrReadOnly
+from ..permissions import IsCreatorOrReadOnly, IsRoomParticipantOrReadOnly, IsAllowedRoomOrReadOnly
 from ..serializers.comment_serializer import CommentSerializer, SingleRoomCommentSerializer
 
 
@@ -15,7 +15,7 @@ class CommentList(generics.GenericAPIView):
     This view is able to display or add comments in all srachat rooms
     or if the room id is given to display or add comments to the given room.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly & IsRoomParticipantOrReadOnly & IsCommentInAllowedRoomOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly & IsRoomParticipantOrReadOnly & IsAllowedRoomOrReadOnly]
     queryset = Room.objects.all()
     serializer_class = SingleRoomCommentSerializer
 
@@ -53,6 +53,6 @@ class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     This view is able to display, update and delete a single comment.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly & IsCreatorOrReadOnly & IsCommentInAllowedRoomOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly & IsCreatorOrReadOnly & IsAllowedRoomOrReadOnly]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
