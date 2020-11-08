@@ -53,9 +53,7 @@ class RoomCreationTest(SrachatTestCase):
     def test_list_all_rooms(self):
         # Creating 2 rooms
         self.client.post(self.url, data=RoomUtils.DATA_ROOM_FIRST._asdict(), format="json")
-        post_response = self.client.post(self.url, data=RoomUtils.DATA_ROOM_SECOND._asdict(), format="json")
-        # Check that for creation are used only modifiable fields
-        self.assertCountEqual(Room.MODIFIABLE_FIELD, list(post_response.data.keys()))
+        self.client.post(self.url, data=RoomUtils.DATA_ROOM_SECOND._asdict(), format="json")
 
         get_response = self.client.get(self.url)
         self.assertEqual(len(get_response.data), 2)
