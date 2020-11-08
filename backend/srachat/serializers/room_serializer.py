@@ -43,7 +43,7 @@ class CreateRoomSerializer(CreateUpdateRoomSerializer):
             admins = [creator]
         elif creator not in admins:
             admins.append(creator)
-        super().save(creator=creator, admins=admins)
+        return super().save(creator=creator, admins=admins)
 
 
 class UpdateRoomSerializer(CreateUpdateRoomSerializer):
