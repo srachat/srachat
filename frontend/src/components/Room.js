@@ -58,7 +58,6 @@ class Room extends Component {
 
     updateParticipation(participantIds) {
         const allParticipants = Object.values(participantIds).flat();
-        console.log(participantIds)
         this.setState({
                 userState: {
                     isCreator: this.state.userState.isCreator,
