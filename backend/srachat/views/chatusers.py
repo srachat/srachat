@@ -43,8 +43,10 @@ class RoomUserList(GenericAPIView):
         room = self.get_object()
         participants = Participation.objects.filter(room=room)
         chat_user_id = {
-            team_number: [participant.chatuser_id for participant in participants if participant.room_id == team_number]
-            for team_number in TeamNumber.values
+            team_number: [
+                participant.chatuser_id for participant in participants
+                if participant.team_number == team_number
+            ] for team_number in TeamNumber.values
         }
         return Response(chat_user_id)
 
