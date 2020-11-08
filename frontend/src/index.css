@@ -13,6 +13,10 @@ code {
     monospace;
 }
 
+h1 {
+  color: white;
+}
+
 .tag {
   background: #111520;
   color: #A79D9E;
@@ -69,3 +73,39 @@ code {
 .flex-item {
   padding: 0 16px;
 }
+
+.form-label {
+  color: white;
+}
+
+.comment {
+  margin: 8px 0 8px 16px;
+  max-width: 488px;
+  padding: 16px 24px;
+  position: relative;
+}
+
+.comment.team-1 {
+  background: #D62546;
+}
+
+.comment.team-2 {
+  background: #45B169;
+}
+
+.comment .comment-body {
+  color: white;
+}
+
+.comment .comment-created {
+  color: #FFFFFF;
+  opacity: 0.5;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+}
+
+.header-username {
+  color: white;
+}
+
