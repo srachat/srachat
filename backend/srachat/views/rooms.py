@@ -1,7 +1,7 @@
 from typing import Type
 
 from rest_framework import generics, status, mixins, serializers
-from rest_framework.exceptions import NotAcceptable, ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -29,9 +29,9 @@ class RoomList(generics.CreateAPIView, generics.ListAPIView):
         callee_user = ChatUser.objects.get(user=request.user)
         serializer = CreateRoomSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(creator=callee_user)
+        room = serializer.save(creator=callee_user)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(room.id, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class RoomDetail(mixins.RetrieveModelMixin,
