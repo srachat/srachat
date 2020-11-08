@@ -3,6 +3,7 @@ import {Route, Switch, useRouteMatch} from "react-router-dom";
 import RoomList from "./RoomList";
 import CreateRoom from "./CreateRoom";
 import Room from "./Room";
+import {NotFound} from "./NotFound";
 
 const Rooms = () => {
     let { path, } = useRouteMatch();
