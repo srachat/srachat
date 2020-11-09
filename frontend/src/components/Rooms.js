@@ -11,6 +11,8 @@ const Rooms = () => {
         <Switch>
             <Route exact path={path} component={RoomList}/>
             <Route path={`${path}/create/`} component={CreateRoom}/>
+            {/* Temp placeholder */}
+            <Route path={`${path}/my/`} component={NotFound}/>
             <Route path={`${path}/:id`} component={Room} />
         </Switch>
     );

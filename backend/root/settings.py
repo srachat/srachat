@@ -48,6 +48,8 @@ ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    # runserver by default will not collectstatic
+    'whitenoise.runserver_nostatic',
     # Django internal applications
     'django.contrib.admin',
     'django.contrib.auth',
@@ -74,13 +76,13 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'root.urls'
@@ -143,12 +145,26 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# Information about the location static files (for the future)
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIR_NAME = 'staticfiles'
+
+# Ensure that staticfiles directory exists
+os.makedirs(STATICFILES_DIR_NAME, exist_ok=True)
+
+# Information about the location static files
+STATIC_ROOT = os.path.join(BASE_DIR, STATICFILES_DIR_NAME)
+
+REACT_APP_DIR = os.path.join(os.path.dirname(BASE_DIR), 'frontend', 'build')
+
+# Add index.html from build to
+TEMPLATES[0]["DIRS"].append(STATIC_ROOT)
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'srachat', 'static'),
+    # Moves static files from frontend to server side
+    os.path.join(REACT_APP_DIR, "static"),
+    REACT_APP_DIR,
 )
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
@@ -158,7 +174,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_URL)
 
 if "IS_HEROKU" in os.environ:
     # Activate Django-Heroku.
-    django_heroku.settings(locals())
+    django_heroku.settings(locals(), staticfiles=False)
 
 # Rest framework auth backend
 REST_FRAMEWORK = {
