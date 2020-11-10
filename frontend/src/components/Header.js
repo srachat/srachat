@@ -4,13 +4,31 @@ import {Link} from "react-router-dom";
 
 import Logo from "./Logo";
 
-const Header = (props) => {
+const HeaderRoute = (url, description) => {
+    return { url: url, description: description }
+}
+
+const HEADER_ROUTES = [
+    HeaderRoute("/rooms/", "All rooms"),
+    HeaderRoute("/rooms/?filter=my", "My participation"),
+    HeaderRoute("/rooms/create/", "Create new room")
+]
+
+const Header = ({ updateUrlCallback }) => {
     return (
         <div className="header">
             <Logo />
-            <Link to="/rooms/">All rooms</Link>
-            <Link to="/rooms/my/">My rooms</Link>
-            <Link to="/rooms/create/">Create new room</Link>
+            {
+                HEADER_ROUTES.map(
+                    headerRoute =>
+                        <Link
+                            to={headerRoute.url}
+                            onClick={() => updateUrlCallback(headerRoute.url)}
+                        >
+                            {headerRoute.description}
+                        </Link>
+                )
+            }
             <AuthSection />
         </div>
     );
