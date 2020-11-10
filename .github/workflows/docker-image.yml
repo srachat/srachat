@@ -19,7 +19,9 @@ jobs:
       with:
         node-version: '12.x'
     - name: Build step
-      run: yarn build
+      run: |
+        yarn install
+        yarn build
       working-directory: ./frontend
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
