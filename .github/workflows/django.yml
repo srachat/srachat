@@ -30,6 +30,15 @@ jobs:
         rm -rf static
         mkdir static
       working-directory: ./backend/srachat
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+       node-version: '12.x'
+    - name: Build step
+      run: |
+       yarn install
+       yarn build
+      working-directory: ./frontend
     - name: Run migrations and Tests
       run: |
         python manage.py collectstatic --noinput
