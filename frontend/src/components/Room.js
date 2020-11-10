@@ -30,7 +30,7 @@ class Room extends Component {
 		    userState: { isCreator: false, isParticipant: false },
             firstRoomFilled: false, secondRoomFilled: false
         };
-		this.currentUserId = parseInt(localStorage.getItem("userId")) || -1;
+		this.currentUserId = parseInt(JSON.parse(localStorage.getItem("userdata"))?.userId) || -1;
 
 		this.deleteRoom = this.deleteRoom.bind(this);
 		this.fetchUsers = this.fetchUsers.bind(this);

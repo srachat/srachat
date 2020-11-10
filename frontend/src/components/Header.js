@@ -18,17 +18,18 @@ const Header = (props) => {
 
 const logOut = () => {
     Cookies.remove("token");
-    localStorage.clear();
+    localStorage.removeItem("userdata");
     window.location.reload(false);
 }
 
 const AuthSection = () => {
     const tokenCookie = Cookies.get("token");
+    const username = JSON.parse(localStorage.getItem("userdata"))?.username;
     return (
         tokenCookie ? (
             <div className="authorized">
                 <Link to="/" onClick={logOut}>Sign out</Link>
-                <span className="header-username">{localStorage.getItem("username")}</span>
+                <span className="header-username">{username}</span>
             </div>
         ) : (
             <div className="unauthorized">

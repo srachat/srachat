@@ -2,9 +2,9 @@ import axios from "axios";
 import React, {Component} from "react";
 
 class Comments extends Component {
-    constructor({roomUrl}) {
-        super({roomUrl});
-        this.roomUrl = roomUrl;
+    constructor(props) {
+        super(props);
+        this.roomUrl = props.roomUrl;
         this.state = {
             comments: []
         }

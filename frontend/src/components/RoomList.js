@@ -22,7 +22,7 @@ class RoomList extends Component {
 		    <div className="container">
                 {
                     this.state.rooms.map(room =>
-                        <RoomCard id={room.id} title={room.title} tags={room.tags} imgUrl={room.image}/>)
+                        <RoomCard key={room.id} id={room.id} title={room.title} tags={room.tags} imgUrl={room.image}/>)
                 }
             </div>
 		);

@@ -10,7 +10,7 @@ import Cookies from 'js-cookie';
 import Header from "./components/Header";
 import Rooms from "./components/Rooms";
 import RoomList from "./components/RoomList";
-import SignIn from "./components/SignIn";
+import {SignIn, SignUp} from "./components/Registration";
 import {NotFound} from "./components/NotFound";
 
 axios.interceptors.request.use(function (config) {
@@ -31,7 +31,18 @@ class App extends Component {
                     <Switch>
                         <Route exact path="/" component={RoomList} />
                         <Route path="/rooms" component={Rooms} />
-                        <Route path="/sign-in" component={SignIn} />
+                        <Route
+                            path="/sign-in"
+                            component={
+                                props => <SignIn {...props} buttonText="Sign in" url="login" />
+                            }
+                        />
+                        <Route
+                            path="/sign-up"
+                            component={
+                                props => <SignUp {...props} buttonText="Sign up" url="registration" />
+                            }
+                        />
                         <Route path={["*", "/404"]} component={NotFound} />
                     </Switch>
                 </div>
