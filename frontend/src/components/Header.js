@@ -14,7 +14,7 @@ const HEADER_ROUTES = [
     HeaderRoute("/rooms/create/", "Create new room")
 ]
 
-const Header = ({ updateUrlCallback }) => {
+const Header = ({ updateUrlCallback, updateAuthCallback, isAuth }) => {
     return (
         <div className="header">
             <Logo />
@@ -29,24 +29,24 @@ const Header = ({ updateUrlCallback }) => {
                         </Link>
                 )
             }
-            <AuthSection />
+            <AuthSection updateAuthCallback={updateAuthCallback} />
         </div>
     );
 };
 
-const logOut = () => {
+const logOut = (updateAuthCallback) => {
     Cookies.remove("token");
     localStorage.removeItem("userdata");
-    window.location.reload(false);
+    updateAuthCallback(false);
 }
 
-const AuthSection = () => {
+const AuthSection = ({ updateAuthCallback }) => {
     const tokenCookie = Cookies.get("token");
     const username = JSON.parse(localStorage.getItem("userdata"))?.username;
     return (
         tokenCookie ? (
             <div className="authorized">
-                <Link to="/" onClick={logOut}>Sign out</Link>
+                <Link to="/" onClick={() => logOut(updateAuthCallback)}>Sign out</Link>
                 <span className="header-username">{username}</span>
             </div>
         ) : (
