@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import React from "react";
+import React, {Component} from "react";
 import {Link} from "react-router-dom";
 
 import Logo from "./Logo";
@@ -14,25 +14,42 @@ const HEADER_ROUTES = [
     HeaderRoute("/rooms/create/", "Create new room")
 ]
 
-const Header = ({ updateUrlCallback, updateAuthCallback, isAuth }) => {
-    return (
-        <div className="header">
-            <Logo />
-            {
-                HEADER_ROUTES.map(
-                    headerRoute =>
-                        <Link
-                            to={headerRoute.url}
-                            onClick={() => updateUrlCallback(headerRoute.url)}
-                        >
-                            {headerRoute.description}
-                        </Link>
-                )
-            }
-            <AuthSection updateAuthCallback={updateAuthCallback} />
-        </div>
-    );
-};
+class Header extends Component {
+    constructor(props) {
+        super(props);
+        const { updateUrlCallback, updateAuthCallback, isAuth } = props;
+        this.updateUrlCallback = updateUrlCallback;
+        this.updateAuthCallback = updateAuthCallback;
+        this.isAuth = isAuth;
+    }
+
+    componentDidMount() {
+        const token = Cookies.get("token");
+        if (token) {
+            this.updateAuthCallback(true);
+        }
+    }
+
+    render() {
+       return (
+            <div className="header">
+                <Logo />
+                {
+                    HEADER_ROUTES.map(
+                        headerRoute =>
+                            <Link
+                                to={headerRoute.url}
+                                onClick={() => this.updateUrlCallback(headerRoute.url)}
+                            >
+                                {headerRoute.description}
+                            </Link>
+                    )
+                }
+                <AuthSection updateAuthCallback={this.updateAuthCallback} />
+            </div>
+        );
+    }
+}
 
 const logOut = (updateAuthCallback) => {
     Cookies.remove("token");
