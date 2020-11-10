@@ -1,23 +1,7 @@
-// @flow
 import React, {Component} from "react";
 import axios from "axios";
 import Comments from "./Comments";
 import Cookies from "js-cookie";
-
-
-type RoomData = {
-    id: number;
-    title: string;
-    created: string;
-    creator: number;
-    first_team_name: string;
-    first_team_votes: number;
-    second_team_name: string;
-    second_team_votes: number;
-    is_active: boolean;
-    language: string;
-    admins: Array;
-}
 
 
 class Room extends Component {
@@ -30,7 +14,7 @@ class Room extends Component {
 		    userState: { isCreator: false, isParticipant: false },
             firstRoomFilled: false, secondRoomFilled: false
         };
-		this.currentUserId = parseInt(localStorage.getItem("userId")) || -1;
+		this.currentUserId = parseInt(JSON.parse(localStorage.getItem("userdata"))?.userId) || -1;
 
 		this.deleteRoom = this.deleteRoom.bind(this);
 		this.fetchUsers = this.fetchUsers.bind(this);

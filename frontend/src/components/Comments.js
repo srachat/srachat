@@ -2,9 +2,9 @@ import axios from "axios";
 import React, {Component} from "react";
 
 class Comments extends Component {
-    constructor({roomUrl}) {
-        super({roomUrl});
-        this.roomUrl = roomUrl;
+    constructor(props) {
+        super(props);
+        this.roomUrl = props.roomUrl;
         this.state = {
             comments: []
         }
@@ -12,7 +12,7 @@ class Comments extends Component {
 
     componentDidMount() {
         axios
-            .get(`${this.roomUrl}comments`)
+            .get(`${this.roomUrl}comments/`)
             .then(res => this.setState({comments: res.data}))
             .catch(err => console.log(err.response.statusText));
     }
@@ -20,7 +20,7 @@ class Comments extends Component {
     render() {
         return (
             <div className="comments">
-                {this.state.comments.map(comment => <Comment {...comment} />)}
+                {this.state.comments.map(comment => <Comment key={comment.id} {...comment} />)}
             </div>
         );
     }

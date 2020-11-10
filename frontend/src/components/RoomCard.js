@@ -5,9 +5,9 @@ import {Link} from "react-router-dom";
 
 const RoomCardImage = ({url}) => {
     if (url === null) {
-        url = process.env.PUBLIC_URL + "/default-image.png";
+        url = process.env.REACT_APP_STATIC_FILES + "/default-image.png";
     }
-    return <img alt="room-card-image" src={url} className="room-card-image" />
+    return <img alt="room-card-thumbnail" src={url} className="room-card-image" />
 }
 
 const RoomCardInfo = ({title, tags}) => {

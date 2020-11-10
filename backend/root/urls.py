@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
@@ -20,7 +21,7 @@ from django.views.generic import TemplateView
 from rest_framework.schemas import get_schema_view
 
 from . import settings
-from .views import HealthCheck
+from .views import HealthCheck, index
 
 SCHEMA_NAME = "pidorapi-schema"
 
@@ -44,6 +45,10 @@ urlpatterns = [
 
     # Health check
     path('health/', HealthCheck.as_view()),
+
+
+    # Front end view as an entry point
+    url(r'^', index, name="index"),
 
 ]
 

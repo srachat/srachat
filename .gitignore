@@ -329,6 +329,7 @@ pip-selfcheck.json
 **/.vscode/
 
 **/static/
+**/staticfiles/
 
 # End of https://www.gitignore.io/api/venv,python,pycharm,intellij,pycharm+all
 
