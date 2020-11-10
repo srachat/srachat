@@ -1,23 +1,7 @@
-// @flow
 import React, {Component} from "react";
 import axios from "axios";
 import Comments from "./Comments";
 import Cookies from "js-cookie";
-
-
-type RoomData = {
-    id: number;
-    title: string;
-    created: string;
-    creator: number;
-    first_team_name: string;
-    first_team_votes: number;
-    second_team_name: string;
-    second_team_votes: number;
-    is_active: boolean;
-    language: string;
-    admins: Array;
-}
 
 
 class Room extends Component {
