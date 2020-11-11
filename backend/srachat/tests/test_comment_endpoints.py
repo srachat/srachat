@@ -225,8 +225,7 @@ class CommentTests(SrachatTestCase):
                                          status_code: int,
                                          field: str,
                                          field_value: [str, int],
-                                         field_value_default: [str, int]
-                                         ):
+                                         field_value_default: [str, int]):
         """
             PATCH, PUT: 'comments/<int:pk>/'
         """
@@ -238,8 +237,10 @@ class CommentTests(SrachatTestCase):
         post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
 
+        reverse_data = reverse(UrlUtils.Comments.DETAILS, args=[1])
+
         #  Try to partial update not allowed fields in the comment
-        patch_response = self.client.patch(reverse(UrlUtils.Comments.DETAILS, args=[1]),
+        patch_response = self.client.patch(reverse_data,
                                            data={field: field_value},
                                            format="json")
 
@@ -250,7 +251,7 @@ class CommentTests(SrachatTestCase):
         self.assertEqual(data[field], field_value_default)
 
         # Try to update not allowed fields in the comment
-        put_response = self.client.put(reverse(UrlUtils.Comments.DETAILS, args=[1]),
+        put_response = self.client.put(reverse_data,
                                        data={field: field_value},
                                        format="json")
 
@@ -259,24 +260,19 @@ class CommentTests(SrachatTestCase):
         data = self.client.get(self.url_first_comment).data
         self.assertEqual(data[field], field_value_default)
 
-    def test_update_comment_info_by_creator_not_allowed_field_creator(self):
+    def test_update_comment_info_by_creator_not_allowed_fields(self):
         """
             PATCH, PUT: 'comments/<int:pk>/'
         """
-        self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field="creator",
-                                              field_value=2, field_value_default=1)
+        # Field - creator
+        self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST,
+                                              field="creator", field_value=2, field_value_default=1)
 
-    def test_update_comment_info_by_creator_not_allowed_field_room(self):
-        """
-            PATCH, PUT: 'comments/<int:pk>/'
-        """
+        # Field - room
         self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST,
                                               field="room", field_value=2, field_value_default=1)
 
-    def test_update_comment_info_by_creator_not_allowed_field_team_number(self):
-        """
-            PATCH, PUT: 'comments/<int:pk>/'
-        """
+        # Field - team number
         self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST,
                                               field="team_number", field_value=2, field_value_default=1)
 

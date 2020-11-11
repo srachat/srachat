@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from .modeldetail import ModelDetail
 from ..models.comment import Comment
 from ..models.room import Room
 from ..models.user import ChatUser, Participation
@@ -52,31 +53,13 @@ class CommentList(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class CommentDetail(mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    GenericViewSet):
+class CommentDetail(ModelDetail):
     """
         This view is able to display, update and delete a single comment.
     """
     permission_classes = [IsAuthenticatedOrReadOnly & IsCreatorOrReadOnly & IsAllowedRoomOrReadOnly]
     queryset = Comment.objects.all()
-    default_actions = {
-        "get": "retrieve",
-        "put": "update",
-        "patch": "partial_update",
-        "delete": "destroy"
-    }
 
-    @classmethod
-    def as_view(cls, **kwargs):
-        actions = kwargs.get("actions", None)
-        if not actions:
-            actions = cls.default_actions
-        return super().as_view(actions=actions, **kwargs)
+    update_serializer_class = UpdateCommentSerializer
+    detail_serializer_class = CommentSerializer
 
-    def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
-        if self.action in ("update", "partial_update"):
-            return UpdateCommentSerializer
-        else:
-            return CommentSerializer
