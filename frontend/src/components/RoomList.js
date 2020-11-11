@@ -5,6 +5,7 @@ import RoomCard from "./RoomCard";
 class RoomList extends Component {
     constructor(props) {
 		super(props);
+		this.queryString = this.props.location.search;
 		this.state = {
 		    rooms: []
 		};
@@ -12,7 +13,7 @@ class RoomList extends Component {
 
 	componentDidMount() {
 		axios
-            .get("/pidor/rooms/")
+            .get(`/pidor/rooms/${this.queryString}`)
             .then(res => this.setState({ rooms: res.data }))
             .catch(err => console.log(err));
 	}

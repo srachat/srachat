@@ -11,6 +11,8 @@ class Auth extends Component {
         this.buttonText = props.buttonText;
         this.url = props.url;
 
+        this.updateAuthCallback = props.updateAuthCallback.bind(this);
+
         this.prepareForm = this.prepareForm.bind(this);
         this.handleAuth = this.handleAuth.bind(this);
         this.getPostData = this.getPostData.bind(this);
@@ -37,14 +39,13 @@ class Auth extends Component {
         axios
             .post(`/pidor/rest-auth/${this.url}/`, data)
             .then(res => {
-                console.log(this.history);
                 Cookies.set("token", res.data.key);
                 return axios
                     .get("/pidor/rest-auth/user/")
                     .then(res => {
                         this.saveUserData(res.data);
                         this.history.push("/");
-                        window.location.reload();
+                        this.updateAuthCallback(true);
                     })
                     .catch(err => {
                         console.log(err);
