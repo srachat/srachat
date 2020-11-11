@@ -6,7 +6,7 @@ class CreateUpdateCommentSerializer(serializers.ModelSerializer):
     # TODO: add validation that creator cannot be banned
     class Meta:
         model = Comment
-        fields = Comment.MODIFIABLE_FIELD
+        fields = Comment.MODIFIABLE_FIELDS
 
     def is_valid(self, raise_exception=False):
         if hasattr(self, 'initial_data'):

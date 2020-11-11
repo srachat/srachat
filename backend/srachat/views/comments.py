@@ -57,8 +57,7 @@ class CommentDetail(mixins.RetrieveModelMixin,
                     mixins.DestroyModelMixin,
                     GenericViewSet):
     """
-        This view is able to display, update and delete a single room.
-        # TODO: extend the documentation. Describe all permissions.
+        This view is able to display, update and delete a single comment.
     """
     permission_classes = [IsAuthenticatedOrReadOnly & IsCreatorOrReadOnly & IsAllowedRoomOrReadOnly]
     queryset = Comment.objects.all()
