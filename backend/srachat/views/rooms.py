@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from .modeldetail import ModelDetail
 from ..models.team_number import TeamNumber
 from ..models.user import ChatUser, Participation
 from ..models.room import Room, RoomVote
@@ -45,35 +46,16 @@ class RoomList(generics.CreateAPIView, generics.ListAPIView):
         return Response(room.id, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class RoomDetail(mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin,
-                 GenericViewSet):
+class RoomDetail(ModelDetail):
     """
     This view is able to display, update and delete a single room.
     # TODO: extend the documentation. Describe all permissions.
     """
     permission_classes = [IsAuthenticatedOrReadOnly & (IsCreatorOrReadOnly | IsRoomAdminOrReadOnly)]
     queryset = Room.objects.all()
-    default_actions = {
-        "get": "retrieve",
-        "put": "update",
-        "patch": "partial_update",
-        "delete": "destroy"
-    }
 
-    @classmethod
-    def as_view(cls, **kwargs):
-        actions = kwargs.get("actions", None)
-        if not actions:
-            actions = cls.default_actions
-        return super().as_view(actions=actions, **kwargs)
-
-    def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
-        if self.action in ("update", "partial_update"):
-            return UpdateRoomSerializer
-        else:
-            return DetailListRoomSerializer
+    update_serializer_class = UpdateRoomSerializer
+    detail_serializer_class = DetailListRoomSerializer
 
 
 class RoomVoteTeam(GenericAPIView):
