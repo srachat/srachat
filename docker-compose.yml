@@ -10,13 +10,12 @@ services:
   web:
     build: .
     volumes:
-    - ./initialize_data.sh:/srachat/initialize_data.sh
+    - ./initialize_data.sh:/srachat/backend/initialize_data.sh
     environment:
       DEBUG: 1
       POSTGRES_HOST: db
     command: >
-      sh -c " chmod +x initialize_data.sh && \
-              python3 manage.py collectstatic --noinput && \
+      sh -c " ls -la && chmod +x initialize_data.sh && \
               python3 manage.py migrate && \
               daphne root.asgi:application --port 8000 --bind 0.0.0.0 -v2"
     ports:

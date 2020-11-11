@@ -1,14 +1,14 @@
 from typing import Type
 
 from rest_framework import generics, status, mixins, serializers
-from rest_framework.exceptions import NotAcceptable, ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from ..models.team_number import TeamNumber
-from ..models.user import ChatUser
+from ..models.user import ChatUser, Participation
 from ..models.room import Room, RoomVote
 from ..permissions import IsCreatorOrReadOnly, IsRoomAdminOrReadOnly
 from ..serializers.room_serializer import DetailListRoomSerializer, CreateRoomSerializer, UpdateRoomSerializer
@@ -23,15 +23,26 @@ class RoomList(generics.CreateAPIView, generics.ListAPIView):
     """
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = DetailListRoomSerializer
-    queryset = Room.objects.all()
+
+    def get_queryset(self):
+        queryset = Room.objects.filter(is_active=True)
+        filter_values = self.request.query_params.get("filter", None)
+        if filter_values == "my":
+            # TODO: refactor to use only filter argument without participation
+            #   e.g. queryset.filter(participation__chatuser_id=self.request.user.id)
+            participation = (Participation.objects
+                             .filter(chatuser_id=self.request.user.id)
+                             .values_list("room_id", flat=True))
+            queryset = queryset.filter(id__in=participation)
+        return queryset
 
     def post(self, request, *args, **kwargs):
         callee_user = ChatUser.objects.get(user=request.user)
         serializer = CreateRoomSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(creator=callee_user)
+        room = serializer.save(creator=callee_user)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(room.id, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class RoomDetail(mixins.RetrieveModelMixin,

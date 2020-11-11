@@ -41,8 +41,14 @@ class RoomUserList(GenericAPIView):
 
     def get(self, request, pk, format=None):
         room = self.get_object()
-        chat_user_ids = ChatUser.objects.filter(rooms=room).values_list('id', flat=True)
-        return Response(chat_user_ids)
+        participants = Participation.objects.filter(room=room)
+        chat_user_id = {
+            team_number: [
+                participant.chatuser_id for participant in participants
+                if participant.team_number == team_number
+            ] for team_number in TeamNumber.values
+        }
+        return Response(chat_user_id)
 
     def post(self, request, pk):
         room = self.get_object()

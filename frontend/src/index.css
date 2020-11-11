@@ -1,0 +1,123 @@
+body {
+  background: #111520;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+h1 {
+  color: white;
+}
+
+.tag {
+  background: #111520;
+  color: #A79D9E;
+  display: inline-block;
+  height: 20px;
+  line-height: 20px;
+  margin: 0 4px 4px 0;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.tag > :first-child {
+  margin-left: 0;
+}
+
+.room-card {
+  background: #1F2631;
+  transition: 0.1s ease-in-out;
+  margin-bottom: 24px;
+}
+
+.room-card:hover {
+  transform: translate(-8px,-8px);
+  transition: 0.1s ease-in-out;
+  box-shadow: 8px 8px #F54B2A;
+}
+
+.room-card-info {
+  padding: 24px;
+}
+
+.room-card-title {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  margin: 0 0 24px 0;
+}
+
+.room-card-image {
+  max-height: 200px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.container {
+  align-items: flex-start;
+  display: inline-flex;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+@media screen and (min-width: 900px)  {
+  .container {
+    padding: 100px;
+  }
+}
+
+@media screen and (max-width: 900px)  {
+  .container {
+    padding: 24px;
+  }
+}
+
+.flex-item {
+  padding: 0 16px;
+}
+
+.form-label {
+  color: white;
+}
+
+.comment {
+  margin: 8px 0 8px 16px;
+  max-width: 488px;
+  padding: 16px 24px;
+  position: relative;
+}
+
+.comment.team-1 {
+  background: #D62546;
+}
+
+.comment.team-2 {
+  background: #45B169;
+}
+
+.comment .comment-body {
+  color: white;
+}
+
+.comment .comment-created {
+  color: #FFFFFF;
+  opacity: 0.5;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+}
+
+.header-username {
+  color: white;
+}
+
