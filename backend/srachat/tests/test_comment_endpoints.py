@@ -221,14 +221,22 @@ class CommentTests(SrachatTestCase):
         data = self.client.get(self.url_first_comment).data
         self.assertEqual(data["body"], CommentUtils.COMMENT_FIRST)
 
-    def _try_update_comment_unsuccessful(self,
-                                         status_code: int,
-                                         field: str,
-                                         field_value: [str, int],
-                                         field_value_default: [str, int]):
+    def _try_partial_update_comment_unsuccessful(self,
+                                                 status_code: int,
+                                                 field_dict: dict):
         """
-            PATCH, PUT: 'comments/<int:pk>/'
+            PATCH: 'comments/<int:pk>/'
         """
+
+        # Get key from dict
+        def dict_get_key(field_dict_arg):
+            for k in field_dict_arg.keys():
+                return k
+
+        # Get value from dict
+        def dict_get_value(field_dict_arg):
+            for v in field_dict_arg.values():
+                return v
 
         # Authorization
         self.set_credentials(self.auth_token_first)
@@ -241,45 +249,31 @@ class CommentTests(SrachatTestCase):
 
         #  Try to partial update not allowed fields in the comment
         patch_response = self.client.patch(reverse_data,
-                                           data={field: field_value},
+                                           data=field_dict,
                                            format="json")
 
         self.assertEqual(patch_response.status_code, status_code)
 
         # Check partial update of the not allowed field
         data = self.client.get(self.url_first_comment).data
-        self.assertEqual(data[field], field_value_default)
+        self.assertNotEqual(data[str(dict_get_key(field_dict))], dict_get_value(field_dict))
 
-        # Try to update not allowed fields in the comment
-        put_response = self.client.put(reverse_data,
-                                       data={field: field_value},
-                                       format="json")
-
-        self.assertEqual(put_response.status_code, status_code)
-        # Check update of the not allowed field
-        data = self.client.get(self.url_first_comment).data
-        self.assertEqual(data[field], field_value_default)
-
-    def test_update_comment_info_by_creator_not_allowed_fields(self):
+    def _try_update_comment_unsuccessful(self,
+                                         status_code: int,
+                                         field_dict: dict):
         """
-            PATCH, PUT: 'comments/<int:pk>/'
+            PUT: 'comments/<int:pk>/'
         """
-        # Field - creator
-        self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST,
-                                              field="creator", field_value=2, field_value_default=1)
 
-        # Field - room
-        self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST,
-                                              field="room", field_value=2, field_value_default=1)
+        # Get key from dict
+        def dict_get_key(field_dict_arg):
+            for k in field_dict_arg.keys():
+                return k
 
-        # Field - team number
-        self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST,
-                                              field="team_number", field_value=2, field_value_default=1)
-
-    def test_update_comment_info_by_creator_not_allowed_field_created(self):
-        """
-            PATCH, PUT: 'comments/<int:pk>/'
-        """
+        # Get value from dict
+        def dict_get_value(field_dict_arg):
+            for v in field_dict_arg.values():
+                return v
 
         # Authorization
         self.set_credentials(self.auth_token_first)
@@ -288,25 +282,45 @@ class CommentTests(SrachatTestCase):
         post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
 
-        time_now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        #  Try to partial update not allowed fields in the comment
-        patch_response = self.client.patch(reverse(UrlUtils.Comments.DETAILS, args=[1]),
-                                           data={"created": time_now},
-                                           format="json")
-
-        self.assertEqual(patch_response.status_code, status.HTTP_400_BAD_REQUEST)
-
-        # Check partial update of the not allowed field
-        data = self.client.get(self.url_first_comment).data
-        self.assertNotEqual(data["created"], time_now)
+        reverse_data = reverse(UrlUtils.Comments.DETAILS, args=[1])
 
         # Try to update not allowed fields in the comment
-        time_now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        put_response = self.client.put(reverse(UrlUtils.Comments.DETAILS, args=[1]),
-                                       data={"created": time_now},
+        put_response = self.client.put(reverse_data,
+                                       data=field_dict,
                                        format="json")
 
-        self.assertEqual(put_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(put_response.status_code, status_code)
         # Check update of the not allowed field
         data = self.client.get(self.url_first_comment).data
-        self.assertNotEqual(data["created"], time_now)
+        #self.assertNotEqual(data, field_dict)
+
+    def test_partial_update_comment_info_by_creator_not_allowed_fields(self):
+        """
+            PATCH 'comments/<int:pk>/'
+        """
+        # Field - creator
+        field_dict = {"creator": 2}
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_dict=field_dict)
+
+        # Field - room
+        field_dict = {"room": 2}
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_dict=field_dict)
+
+        # Field - team number
+        field_dict = {"team_number": 2}
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_dict=field_dict)
+
+        # Field - created
+        # Create new value for the selected field
+        new_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        field_dict = {"created": new_time}
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_dict=field_dict)
+
+    def test_update_comment_info_by_creator_not_allowed_fields(self):
+        """
+            PUT 'comments/<int:pk>/'
+        """
+        # All fields
+        new_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        field_dict = {"creator": 2, "room": 2, "team_number": 2, "created": new_time}
+        self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_dict=field_dict)
