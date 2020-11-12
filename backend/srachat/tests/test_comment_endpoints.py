@@ -187,94 +187,87 @@ class CommentTests(SrachatTestCase):
 
         self._try_post_comment_check(status.HTTP_403_FORBIDDEN, self.url_first_room_comments, self.auth_token_third, {})
 
-    def test_update_comment_info_by_creator_allowed_fields(self):
+    def _try_update_comment_allowed_field(self,
+                                          status_code: int,
+                                          field_name: str,
+                                          field_value: [str, int],
+                                          auth: str):
         """
             PATCH, PUT: 'comments/<int:pk>/'
         """
 
-        # Authorization
-        self.set_credentials(self.auth_token_first)
+        # New authorization
+        self.set_credentials(auth)
 
-        # Create a new comment
-        post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
-        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
-
-        # Partial update allowed fields in the comment
-        patch_response = self.client.patch(reverse(UrlUtils.Comments.DETAILS, args=[1]),
-                                           data={"body": CommentUtils.COMMENT_SECOND},
+        # Try to update allowed field in the comment
+        patch_response = self.client.patch(self.url_first_comment,
+                                           data={field_name: field_value},
                                            format="json")
 
-        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(patch_response.status_code, status_code)
 
-        # Check partial update of the body comment
+        # Check update of the allowed field
         data = self.client.get(self.url_first_comment).data
-        self.assertEqual(data["body"], CommentUtils.COMMENT_SECOND)
+        self.assertEqual(data[field_name], field_value)
 
-        # Update allowed fields in the comment
-        put_response = self.client.put(reverse(UrlUtils.Comments.DETAILS, args=[1]),
-                                       data={"body": CommentUtils.COMMENT_FIRST},
+        # Try to update allowed field in the comment
+        put_response = self.client.put(self.url_first_comment,
+                                       data={field_name: field_value},
                                        format="json")
 
-        self.assertEqual(put_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(put_response.status_code, status_code)
 
-        # Check update of the body comment
+        # Check update of the allowed field
         data = self.client.get(self.url_first_comment).data
-        self.assertEqual(data["body"], CommentUtils.COMMENT_FIRST)
+        self.assertEqual(data[field_name], field_value)
 
     def _try_partial_update_comment_unsuccessful(self,
                                                  status_code: int,
-                                                 field_dict: dict):
+                                                 field_name: str,
+                                                 field_value: [str, int],
+                                                 auth: str):
         """
             PATCH: 'comments/<int:pk>/'
         """
-
-        # Get key from dict
-        def dict_get_key(field_dict_arg):
-            for k in field_dict_arg.keys():
-                return k
-
-        # Get value from dict
-        def dict_get_value(field_dict_arg):
-            for v in field_dict_arg.values():
-                return v
-
-        # Authorization
-        self.set_credentials(self.auth_token_first)
-
-        # Create a new comment
-        post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
-        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
-
-        reverse_data = reverse(UrlUtils.Comments.DETAILS, args=[1])
+        # New authorization
+        self.set_credentials(auth)
 
         #  Try to partial update not allowed fields in the comment
-        patch_response = self.client.patch(reverse_data,
-                                           data=field_dict,
+        patch_response = self.client.patch(self.url_first_comment,
+                                           data={field_name: field_value},
                                            format="json")
 
         self.assertEqual(patch_response.status_code, status_code)
 
         # Check partial update of the not allowed field
         data = self.client.get(self.url_first_comment).data
-        self.assertNotEqual(data[str(dict_get_key(field_dict))], dict_get_value(field_dict))
+        self.assertNotEqual(data[field_name], field_value)
 
     def _try_update_comment_unsuccessful(self,
                                          status_code: int,
-                                         field_dict: dict):
+                                         field_dict,
+                                         auth: str):
+
         """
             PUT: 'comments/<int:pk>/'
         """
+        # New authorization
+        self.set_credentials(auth)
 
-        # Get key from dict
-        def dict_get_key(field_dict_arg):
-            for k in field_dict_arg.keys():
-                return k
+        # Try to update not allowed fields in the comment
+        put_response = self.client.put(self.url_first_comment,
+                                       data=field_dict,
+                                       format="json")
 
-        # Get value from dict
-        def dict_get_value(field_dict_arg):
-            for v in field_dict_arg.values():
-                return v
+        self.assertEqual(put_response.status_code, status_code)
+        # Check update of the not allowed field
+        data = self.client.get(self.url_first_comment).data
+        self.assertNotEqual(data, field_dict)
 
+    def test_update_comment_info_allowed_field(self):
+        """
+            PATCH 'comments/<int:pk>/'
+        """
         # Authorization
         self.set_credentials(self.auth_token_first)
 
@@ -282,45 +275,203 @@ class CommentTests(SrachatTestCase):
         post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
 
-        reverse_data = reverse(UrlUtils.Comments.DETAILS, args=[1])
+        """ Creator """
+        self._try_update_comment_allowed_field(status_code=status.HTTP_200_OK,
+                                               field_name="body",
+                                               field_value=CommentUtils.COMMENT_SECOND,
+                                               auth=self.auth_token_first)
 
-        # Try to update not allowed fields in the comment
-        put_response = self.client.put(reverse_data,
-                                       data=field_dict,
-                                       format="json")
+        """ Admin """
+        self._try_update_comment_allowed_field(status_code=status.HTTP_403_FORBIDDEN,
+                                               field_name="body",
+                                               field_value=CommentUtils.COMMENT_SECOND,
+                                               auth=self.auth_token_second)
 
-        self.assertEqual(put_response.status_code, status_code)
-        # Check update of the not allowed field
-        data = self.client.get(self.url_first_comment).data
-        #self.assertNotEqual(data, field_dict)
+        """ No participant """
+        self._try_update_comment_allowed_field(status_code=status.HTTP_403_FORBIDDEN,
+                                               field_name="body",
+                                               field_value=CommentUtils.COMMENT_SECOND,
+                                               auth=self.auth_token_third)
 
-    def test_partial_update_comment_info_by_creator_not_allowed_fields(self):
+        """ Ban user """
+        # Create a ban user
+        self.client.post(reverse("ban_user", args=[1]), data={"id": 3}, format="json")
+
+        self._try_update_comment_allowed_field(status_code=status.HTTP_403_FORBIDDEN,
+                                               field_name="body",
+                                               field_value=CommentUtils.COMMENT_SECOND,
+                                               auth=self.auth_token_third)
+
+        """ Inactive room """
+        # Deactivation room
+        self.client.post(reverse("deactivate_room", args=[1]))
+
+        self._try_update_comment_allowed_field(status_code=status.HTTP_200_OK,
+                                               field_name="body",
+                                               field_value=CommentUtils.COMMENT_SECOND,
+                                               auth=self.auth_token_first)
+
+    def test_partial_update_comment_info_not_allowed_fields(self):
         """
             PATCH 'comments/<int:pk>/'
         """
-        # Field - creator
-        field_dict = {"creator": 2}
-        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_dict=field_dict)
+        # Authorization
+        self.set_credentials(self.auth_token_first)
 
-        # Field - room
-        field_dict = {"room": 2}
-        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_dict=field_dict)
+        # Create a new comment
+        post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
 
-        # Field - team number
-        field_dict = {"team_number": 2}
-        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_dict=field_dict)
-
-        # Field - created
         # Create new value for the selected field
         new_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        field_dict = {"created": new_time}
-        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_dict=field_dict)
 
-    def test_update_comment_info_by_creator_not_allowed_fields(self):
+        """ Creator """
+        # Field - creator
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_name="creator",
+                                                      field_value=2, auth=self.auth_token_first)
+
+        # Field - room
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_name="room",
+                                                      field_value=2, auth=self.auth_token_first)
+
+        # Field - team number
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_name="team_number",
+                                                      field_value=2, auth=self.auth_token_first)
+
+        # Field - created
+
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_name="created",
+                                                      field_value=new_time, auth=self.auth_token_first)
+
+        """ Admin """
+        # Field - creator
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="creator",
+                                                      field_value=2, auth=self.auth_token_second)
+
+        # Field - room
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="room",
+                                                      field_value=2, auth=self.auth_token_second)
+
+        # Field - team number
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="team_number",
+                                                      field_value=2, auth=self.auth_token_second)
+
+        # Field - created
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="created",
+                                                      field_value=new_time, auth=self.auth_token_second)
+
+        """ No participant """
+        # Field - creator
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="creator",
+                                                      field_value=2, auth=self.auth_token_third)
+
+        # Field - room
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="room",
+                                                      field_value=2, auth=self.auth_token_third)
+
+        # Field - team number
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="team_number",
+                                                      field_value=2, auth=self.auth_token_third)
+
+        # Field - created
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="created",
+                                                      field_value=new_time, auth=self.auth_token_third)
+
+        """ Ban user """
+        # Create a ban user
+        self.client.post(reverse("ban_user", args=[1]), data={"id": 3}, format="json")
+
+        # Field - creator
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="creator",
+                                                      field_value=2, auth=self.auth_token_third)
+
+        # Field - room
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="room",
+                                                      field_value=2, auth=self.auth_token_third)
+
+        # Field - team number
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="team_number",
+                                                      field_value=2, auth=self.auth_token_third)
+
+        # Field - created
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN, field_name="created",
+                                                      field_value=new_time, auth=self.auth_token_third)
+
+        """ Inactive room """
+        # Deactivation room
+        self.client.post(reverse("deactivate_room", args=[1]))
+
+        # Field - creator
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_name="creator",
+                                                      field_value=2, auth=self.auth_token_first)
+
+        # Field - room
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_name="room",
+                                                      field_value=2, auth=self.auth_token_first)
+
+        # Field - team number
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_name="team_number",
+                                                      field_value=2, auth=self.auth_token_first)
+
+        # Field - created
+        self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_name="created",
+                                                      field_value=new_time, auth=self.auth_token_first)
+
+    def test_update_comment_info_not_allowed_fields(self):
         """
             PUT 'comments/<int:pk>/'
         """
-        # All fields
+        # Authorization
+        self.set_credentials(self.auth_token_first)
+
+        # Create a new comment
+        post_response = self.client.post(self.url_first_room_comments, data=CommentUtils.DATA_COMMENT_FIRST)
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+
         new_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        field_dict = {"creator": 2, "room": 2, "team_number": 2, "created": new_time}
-        self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_dict=field_dict)
+
+        """ Creator """
+        # All fields
+        self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST,
+                                              auth=self.auth_token_first,
+                                              field_dict={"id": 1, "body": CommentUtils.COMMENT_FIRST,
+                                                          "created": new_time, "team_number": 2,
+                                                          "creator": 2, "room": 2})
+
+        """ Admin """
+        # All fields
+        self._try_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN,
+                                              auth=self.auth_token_second,
+                                              field_dict={"id": 1, "body": CommentUtils.COMMENT_FIRST,
+                                                          "created": new_time, "team_number": 2,
+                                                          "creator": 2, "room": 2})
+
+        """ No participant """
+        # All fields
+        self._try_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN,
+                                              auth=self.auth_token_third,
+                                              field_dict={"id": 1, "body": CommentUtils.COMMENT_FIRST,
+                                                          "created": new_time, "team_number": 2,
+                                                          "creator": 2, "room": 2})
+
+        """ Ban user """
+        # Create a ban user
+        self.client.post(reverse("ban_user", args=[1]), data={"id": 3}, format="json")
+
+        # All fields
+        self._try_update_comment_unsuccessful(status_code=status.HTTP_403_FORBIDDEN,
+                                              auth=self.auth_token_third,
+                                              field_dict={"id": 1, "body": CommentUtils.COMMENT_FIRST,
+                                                          "created": new_time, "team_number": 2,
+                                                          "creator": 2, "room": 2})
+
+        """ Inactive room """
+        # Deactivation room
+        self.client.post(reverse("deactivate_room", args=[1]))
+
+        # All fields
+        self._try_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST,
+                                              auth=self.auth_token_first,
+                                              field_dict={"id": 1, "body": CommentUtils.COMMENT_FIRST,
+                                                          "created": new_time, "team_number": 2,
+                                                          "creator": 2, "room": 2})
