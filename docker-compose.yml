@@ -7,6 +7,10 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+  redis:
+    image: redis
+    expose:
+      - "6379"
   web:
     build: .
     volumes:
@@ -14,14 +18,18 @@ services:
     environment:
       DEBUG: 1
       POSTGRES_HOST: db
+      REDIS_URL: "redis://redis:6379/"
     command: >
-      sh -c " ls -la && chmod +x initialize_data.sh && \
+      sh -c " chmod +x initialize_data.sh && \
               python3 manage.py migrate && \
               daphne root.asgi:application --port 8000 --bind 0.0.0.0 -v2"
     ports:
       - 8000:8000
     depends_on:
       - db
+      - redis
+    links:
+      - redis
     healthcheck:
       test: curl -f http://localhost:8000/health || exit 1
       interval: 1m30s
