@@ -207,8 +207,8 @@ class CommentTests(SrachatTestCase):
         self.assertEqual(patch_response.status_code, status_code)
 
         # Check update of the allowed field
-        data = self.client.get(self.url_first_comment).data
-        self.assertEqual(data[field_name], field_value)
+        update_data = self.client.get(self.url_first_comment).data
+        self.assertEqual(update_data[field_name], field_value)
 
         # Try to update allowed field in the comment
         put_response = self.client.put(self.url_first_comment,
@@ -218,8 +218,8 @@ class CommentTests(SrachatTestCase):
         self.assertEqual(put_response.status_code, status_code)
 
         # Check update of the allowed field
-        data = self.client.get(self.url_first_comment).data
-        self.assertEqual(data[field_name], field_value)
+        update_data = self.client.get(self.url_first_comment).data
+        self.assertEqual(update_data[field_name], field_value)
 
     def _try_partial_update_comment_unsuccessful(self,
                                                  status_code: int,
@@ -240,8 +240,8 @@ class CommentTests(SrachatTestCase):
         self.assertEqual(patch_response.status_code, status_code)
 
         # Check partial update of the not allowed field
-        data = self.client.get(self.url_first_comment).data
-        self.assertNotEqual(data[field_name], field_value)
+        update_data = self.client.get(self.url_first_comment).data
+        self.assertNotEqual(update_data[field_name], field_value)
 
     def _try_update_comment_unsuccessful(self,
                                          status_code: int,
@@ -261,8 +261,8 @@ class CommentTests(SrachatTestCase):
 
         self.assertEqual(put_response.status_code, status_code)
         # Check update of the not allowed field
-        data = self.client.get(self.url_first_comment).data
-        self.assertNotEqual(data, field_dict)
+        update_data = self.client.get(self.url_first_comment).data
+        self.assertNotEqual(update_data, field_dict)
 
     def test_update_comment_info_allowed_field(self):
         """
@@ -339,7 +339,6 @@ class CommentTests(SrachatTestCase):
                                                       field_value=2, auth=self.auth_token_first)
 
         # Field - created
-
         self._try_partial_update_comment_unsuccessful(status_code=status.HTTP_400_BAD_REQUEST, field_name="created",
                                                       field_value=new_time, auth=self.auth_token_first)
 
