@@ -1,7 +1,6 @@
 from typing import Type
 
 from rest_framework import mixins, serializers
-
 from rest_framework.viewsets import GenericViewSet
 
 

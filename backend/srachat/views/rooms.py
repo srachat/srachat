@@ -4,7 +4,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from .modeldetailview import ModelDetailView
+from .modeldetail import ModelDetailView
 from ..models.team_number import TeamNumber
 from ..models.user import ChatUser, Participation
 from ..models.room import Room, RoomVote

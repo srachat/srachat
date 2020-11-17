@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from .modeldetailview import ModelDetailView
+from .modeldetail import ModelDetailView
 from ..models.comment import Comment
 from ..models.room import Room
 from ..models.user import ChatUser, Participation
