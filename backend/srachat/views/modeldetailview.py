@@ -5,12 +5,12 @@ from rest_framework import mixins, serializers
 from rest_framework.viewsets import GenericViewSet
 
 
-class ModelDetail(mixins.RetrieveModelMixin,
-                  mixins.UpdateModelMixin,
-                  mixins.DestroyModelMixin,
-                  GenericViewSet):
+class ModelDetailView(mixins.RetrieveModelMixin,
+                      mixins.UpdateModelMixin,
+                      mixins.DestroyModelMixin,
+                      GenericViewSet):
     """
-    This view is able to display, update and delete a single room.
+    This view is able to update a single model of project (room, comment).
     # TODO: extend the documentation. Describe all permissions.
     """
     permission_classes = None

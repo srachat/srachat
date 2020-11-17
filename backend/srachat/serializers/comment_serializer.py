@@ -1,11 +1,10 @@
 from rest_framework import serializers
 
-from .createupdatemodelserializer import CreateUpdateModelSerializer
+from .create_update_model_serializer import CreateUpdateModelSerializer
 from ..models.comment import Comment
 
 
 class CreateUpdateCommentSerializer(CreateUpdateModelSerializer):
-
     class Meta:
         model = Comment
         fields = Comment.MODIFIABLE_FIELDS
@@ -16,7 +15,7 @@ class UpdateCommentSerializer(CreateUpdateCommentSerializer):
     pass
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class ListCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = '__all__'

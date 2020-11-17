@@ -2,9 +2,6 @@ from rest_framework import serializers
 
 
 class CreateUpdateModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = None
-        fields = None
 
     def is_valid(self, raise_exception=False):
         if hasattr(self, 'initial_data'):

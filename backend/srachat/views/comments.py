@@ -1,17 +1,14 @@
-from typing import Type
-
-from rest_framework import status, generics, mixins, serializers
+from rest_framework import status, generics
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 
-from .modeldetail import ModelDetail
+from .modeldetailview import ModelDetailView
 from ..models.comment import Comment
 from ..models.room import Room
 from ..models.user import ChatUser, Participation
 from ..permissions import IsCreatorOrReadOnly, IsRoomParticipantOrReadOnly, IsAllowedRoomOrReadOnly
-from ..serializers.comment_serializer import CommentSerializer, SingleRoomCommentSerializer, UpdateCommentSerializer
+from ..serializers.comment_serializer import ListCommentSerializer, SingleRoomCommentSerializer, UpdateCommentSerializer
 
 
 class CommentList(generics.GenericAPIView):
@@ -53,7 +50,7 @@ class CommentList(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class CommentDetail(ModelDetail):
+class CommentDetail(ModelDetailView):
     """
         This view is able to display, update and delete a single comment.
     """
@@ -61,5 +58,4 @@ class CommentDetail(ModelDetail):
     queryset = Comment.objects.all()
 
     update_serializer_class = UpdateCommentSerializer
-    detail_serializer_class = CommentSerializer
-
+    detail_serializer_class = ListCommentSerializer

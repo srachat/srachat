@@ -2,7 +2,7 @@ from typing import List
 
 from rest_framework import serializers
 
-from .createupdatemodelserializer import CreateUpdateModelSerializer
+from .create_update_model_serializer import CreateUpdateModelSerializer
 from ..models.room import Room
 from ..models.tag import Tag
 

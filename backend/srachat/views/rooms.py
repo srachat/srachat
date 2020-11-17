@@ -1,13 +1,10 @@
-from typing import Type
-
-from rest_framework import generics, status, mixins, serializers
+from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 
-from .modeldetail import ModelDetail
+from .modeldetailview import ModelDetailView
 from ..models.team_number import TeamNumber
 from ..models.user import ChatUser, Participation
 from ..models.room import Room, RoomVote
@@ -46,7 +43,7 @@ class RoomList(generics.CreateAPIView, generics.ListAPIView):
         return Response(room.id, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class RoomDetail(ModelDetail):
+class RoomDetail(ModelDetailView):
     """
     This view is able to display, update and delete a single room.
     # TODO: extend the documentation. Describe all permissions.
