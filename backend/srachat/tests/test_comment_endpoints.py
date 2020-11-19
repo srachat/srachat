@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Callable, Union
 
 from django.urls import reverse
 from rest_framework import status
@@ -35,6 +35,7 @@ class CommentTests(SrachatTestCase):
         self.auth_token_first = self.register_user_return_token(UserUtils.DATA_FIRST)
         self.auth_token_second = self.register_user_return_token(UserUtils.DATA_SECOND)
         self.auth_token_third = self.register_user_return_token(UserUtils.DATA_THIRD)
+        self.auth_token_forth = self.register_user_return_token(UserUtils.DATA_FORTH)
 
         # We are assuming that the first created room would have an Id = 1
         #   and the second room would have an Id = 2
