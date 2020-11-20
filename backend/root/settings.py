@@ -48,6 +48,11 @@ ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    # Internal applications
+    'srachat',
+
+    "channels",
+
     # runserver by default will not collectstatic
     'whitenoise.runserver_nostatic',
     # Django internal applications
@@ -66,9 +71,6 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'rest_framework',
     'rest_framework.authtoken',
-
-    # Internal applications
-    'srachat',
 ]
 
 # Next setup is required for django-rest-auth registration module
@@ -105,6 +107,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'root.wsgi.application'
 ASGI_APPLICATION = 'root.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+        },
+    },
+}
 
 
 # Password validation

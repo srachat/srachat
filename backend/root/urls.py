@@ -48,7 +48,7 @@ urlpatterns = [
 
 
     # Front end view as an entry point
-    url(r'^', index, name="index"),
+    path('', index, name="index"),
 
 ]
 

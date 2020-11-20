@@ -1,7 +1,8 @@
 import React, {Component} from "react";
 import axios from "axios";
-import Comments from "./Comments";
+import Comment from "./Comments";
 import Cookies from "js-cookie";
+import ReconnectingWebSocket from "reconnecting-websocket";
 
 
 class Room extends Component {
@@ -11,8 +12,10 @@ class Room extends Component {
 		this.id = props.match.params.id;
 		this.roomUrl = `/pidor/rooms/${this.id}/`;
 		this.state = {
+		    comments: [],
 		    userState: { isCreator: false, isParticipant: false },
-            firstRoomFilled: false, secondRoomFilled: false
+            firstRoomFilled: false, secondRoomFilled: false,
+            websocket: undefined
         };
 		this.currentUserId = parseInt(JSON.parse(localStorage.getItem("userdata"))?.userId) || -1;
 
@@ -23,6 +26,26 @@ class Room extends Component {
 		this.updateCreator = this.updateCreator.bind(this);
 		this.updateParticipation = this.updateParticipation.bind(this);
 	}
+
+    constructWebSocket() {
+        // This is WIP
+        // Next patches will bring room join, comment deletion/update,
+        // subchat separation, viewer count
+        const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const ws = new ReconnectingWebSocket(`${ws_scheme}://${window.location.host}/ws${this.roomUrl}`);
+        ws.onopen = () => { console.log("Successfully joined the room :)") }
+        ws.onmessage = event => {
+            const data = JSON.parse(event.data);
+            if (data.type === "error") {
+                alert(data.error_message)
+            } else {
+                this.setState({ comments: this.state.comments.concat(data.comments) });
+            }
+        }
+        ws.onerror = error => { console.log(error) }
+        ws.onclose = () => { console.log("Disconnected") }
+        return ws;
+    }
 
 	updateCreator() {
         this.setState({
@@ -61,7 +84,13 @@ class Room extends Component {
                 return this.fetchUsers();
             })
             .catch(err => this.props.history.push("/404"));
+        this.setState({websocket: this.constructWebSocket()});
 	}
+
+    componentWillUnmount() {
+        this.state.websocket && this.state.websocket.close();
+        this.setState({ websocket: undefined });
+    }
 
 	deleteRoom() {
         axios
@@ -73,10 +102,8 @@ class Room extends Component {
     submitMessage(event) {
         event.preventDefault();
         const body = new FormData(event.target).get("body");
-        axios
-            .post(`${this.roomUrl}comments/`, {"body": body})
-            .then(() => event.target.reset())
-            .catch(err => console.log(err.response.statusText));
+        event.target.reset();
+        this.state.websocket.send(JSON.stringify({"body": body}));
     }
 
     joinTeam(event) {
@@ -105,12 +132,14 @@ class Room extends Component {
                     />
                     {this.state.userState.isCreator && <button className="room-delete" onClick={this.deleteRoom}>Delete room</button> }
                 </div>
-                <Comments roomUrl={this.roomUrl} />
-            {/*  Extract the footer into the separate component  */}
+                <div className="comments">
+                    {this.state.comments.map(comment => <Comment key={comment.id} {...comment} />)}
+                </div>
+            {/*  TODO: Extract the footer into the separate component  */}
             <div className="room-footer">
                 {this.state.userState.isParticipant ? (
                     <form onSubmit={this.submitMessage}>
-                        <input name="body" placeholder="Tell them your opinion"/>
+                        <input name="body" placeholder="Tell them your opinion" required={true}/>
                         <input type="submit" value="Send message" className="send-message" />
                     </form>
                 ) : Cookies.get("token") && (
