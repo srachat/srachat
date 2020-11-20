@@ -2,24 +2,16 @@ from typing import List
 
 from rest_framework import serializers
 
+from .create_update_model_serializer import CreateUpdateModelSerializer
 from ..models.room import Room
 from ..models.tag import Tag
 
 
-class CreateUpdateRoomSerializer(serializers.ModelSerializer):
+class CreateUpdateRoomSerializer(CreateUpdateModelSerializer):
     # TODO: add validation that creator cannot be banned
     class Meta:
         model = Room
         fields = Room.MODIFIABLE_FIELD
-
-    def is_valid(self, raise_exception=False):
-        if hasattr(self, 'initial_data'):
-            payload_keys = self.initial_data.keys()
-            serializer_fields = self.fields.keys()
-            extra_fields = list(filter(lambda key: key not in serializer_fields, payload_keys))
-            if extra_fields:
-                raise serializers.ValidationError(f"Extra fields {extra_fields} in payload")
-        return super().is_valid(raise_exception)
 
     def validate_tags(self, value: List[Tag]):
         if len(value) > Room.TAGS_AMOUNT:

@@ -37,11 +37,13 @@ class UserUtils:
     USERNAME_FIRST = USERNAME + "1"
     USERNAME_SECOND = USERNAME + "2"
     USERNAME_THIRD = USERNAME + "3"
+    USERNAME_FORTH = USERNAME + "4"
 
     EMAIL = "email@email.com"
     EMAIL_FIRST = "1" + EMAIL
     EMAIL_SECOND = "2" + EMAIL
     EMAIL_THIRD = "3" + EMAIL
+    EMAIL_FORTH = "4" + EMAIL
 
     PASSWORD = "ez3}yh^L4%27Dnn]"
 
@@ -50,6 +52,7 @@ class UserUtils:
     DATA_THIRD = TestUser(
         USERNAME_THIRD, PASSWORD, EMAIL_THIRD, first_name="first_name", last_name="last_name"
     ).as_dict()
+    DATA_FORTH = TestUser(USERNAME_FORTH, PASSWORD, EMAIL_FORTH).as_dict()
     DATA_ADMIN = TestUser("admin", "adminTESTPASSWORD123", "admin" + EMAIL).as_dict()
 
 
