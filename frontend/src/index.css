@@ -1,6 +1,5 @@
 body {
   background: #111520;
-  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -14,6 +13,10 @@ code {
 }
 
 h1 {
+  color: white;
+}
+
+h2 {
   color: white;
 }
 
@@ -35,13 +38,18 @@ h1 {
 .room-card {
   background: #1F2631;
   transition: 0.1s ease-in-out;
-  margin-bottom: 24px;
 }
 
 .room-card:hover {
   transform: translate(-8px,-8px);
   transition: 0.1s ease-in-out;
   box-shadow: 8px 8px #F54B2A;
+}
+
+.room-card:active {
+  transform: translate(-4px,-4px);
+  transition: 0.1s ease-in-out;
+  box-shadow: 4px 4px #C93D22;
 }
 
 .room-card-info {
@@ -65,26 +73,507 @@ h1 {
 .container {
   align-items: flex-start;
   display: inline-flex;
-  justify-content: center;
+  justify-content: left;
   flex-direction: row;
   flex-wrap: wrap;
 }
 
-@media screen and (min-width: 900px)  {
+.room-bg {
+  background: #1F2631;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  height: 100%;
+  z-index: -999;
+}
+
+@media screen and (min-width: 1920px)  {
   .container {
-    padding: 100px;
+    margin: 0 auto;
+    width: 1600px;
+  }
+
+  .header {
+    align-items: center;
+    display: flex;
+    background: #111520;
+    border-bottom: #F54B2A solid 3px;
+    height: 88px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+  }
+
+  .header .container {
+    align-items: center;
+    display: flex;
+    height: 100%;
+  }
+
+  .header .logo {
+    width: 240px;
+  }
+
+  .header .participation-section {
+    display: flex;
+    align-items: center;
+    margin-left: 32px;
+    width: 784px;
+  }
+
+  .header .participation-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    height: 88px;
+  }
+
+  .header .participation-section .rooms-section {
+    float: left;
+  }
+
+  .header .participation-section .rooms-section .participation-item {
+    float: left;
+    color: #A79D9E;
+    transition: 0.2s ease-in-out;
+  }
+
+  .header .participation-section .rooms-section .participation-item.active {
+    color: white;
+    font-weight: bold;
+    border-bottom: solid 6px #F54B2A;
+    box-sizing: border-box;
+    transition: 0.2s ease-in-out;
+  }
+
+  .header .participation-section .rooms-section .participation-item:hover {
+    color: white;
+    transition: 0.2s ease-in-out;
+  }
+
+  .header .participation-section .rooms-section .participation-item:active {
+    color: white;
+    font-weight: bold;
+    transition: 0.2s ease-in-out;
+  }
+
+  .header .participation-section .rooms-section .participation-item:first-child {
+    margin-right: 16px;
+    width: 104px;
+  }
+
+  .header .participation-section .rooms-section .participation-item:last-child {
+    margin-left: 16px;
+    width: 240px;
+  }
+
+  .header .create-room {
+    width: 240px;
+    border: solid 2px #F54B2A;
+    color: #F54B2A;
+    height: 40px;
+    margin-left: auto;
+    transition: 0.15s ease-in-out;
+  }
+
+  .header .create-room:hover {
+    color: white;
+    background: #F54B2A;
+    transition: 0.15s ease-in-out;
+  }
+
+  .header .create-room:active {
+    color: white;
+    background: #C93D22;
+    border: solid 2px #C93D22;
+    transition: 0.15s ease-in-out;
+  }
+
+  .header .auth-section {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+  }
+
+  .header .auth-section .unauthorized .unauthorized-item {
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    width: 104px;
+    height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+  }
+
+  .header .auth-section .unauthorized .unauthorized-item:hover {
+    color: #F54B2A;
+  }
+
+  .header .auth-section .unauthorized .unauthorized-item:active {
+    color: #C93D22;
+  }
+
+  .header .sign-in {
+    margin-right: 32px;
+    float: left;
+  }
+
+  .main {
+    padding-top: 80px;
+    display: flex;
+    justify-content: left;
+  }
+
+  .room-container {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+
+  .room-card {
+    width: 376px;
+  }
+
+  .room-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #111520;
+    width: 1760px;
+    margin: 0 auto;
+    height: 80px;
+    z-index: 999;
+    display: flex;
+  }
+
+  .room-footer form {
+    width: 100%;
+    display: flex;
+  }
+
+  .room-footer .send-message-text {
+    width: 100%;
+    height: 80px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 18px;
+    padding-left: 80px;
+  }
+
+  .room-footer .send-message-button {
+    width: 80px;
+    height: 80px;
+    border: none;
+    background: #F54B2A;
+  }
+
+  .room-footer .send-message-button:hover {
+    background: #DF4325;
+  }
+
+  .room-footer .send-message-button:active {
+    background: #C93D22;
+  }
+
+  .room-header {
+    background: #1F2631;
+    margin: 0 auto;
+    display: flex;
+    height: 72px;
+    position: fixed;
+    top: 88px;
+    left: 0;
+    right: 0;
+    width: 1760px;
+    z-index: 998;
+  }
+
+  .room-bg {
+    width: 1760px;
+  }
+
+  .room-title {
+    width: 592px;
+  }
+
+  .room-title h2 {
+    margin-left: 80px;
+    text-decoration: underline #F54B2A;
+  }
+
+  .room-views {
+    color: #F54B2A;
+    width: 304px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px
+  }
+
+  .room-votes {
+    width: 784px;
+    display: flex;
+  }
+
+  .room-votes .room-votes-label {
+    width: 240px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .room-vote-items {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+
+  .room-vote-items .team-votes {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .room-vote-items .team-votes .team-votes-name {
+    font-weight: bold;
+  }
+
+  .room-vote-items .team-votes.team-1 .team-votes-name {
+    color: #A91A35;
+  }
+
+  .room-vote-items .team-votes.team-2 .team-votes-name {
+    color: #45B169;
+  }
+
+  .room-vote-items .team-votes .team-votes-number {
+    color: white;
+  }
+
+  .room-settings {
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .room-settings:hover {
+    background: #333841;
+  }
+
+  .room-settings:active, .room-settings.open {
+    background: #111520;
+    border-color: #111520;
+  }
+
+  .room-settings:hover svg, .room-settings svg:hover {
+    transform: rotate(-90deg);
+    transition: 0.3s ease-in-out;
+    fill: white;
+  }
+
+  .room-settings:active svg, .room-settings svg:active, .room-settings.open svg {
+    transform: rotate(-120deg);
+    transition: 0.1s ease-in-out;
+    fill: #C93D22;
+  }
+
+  .room-settings svg {
+    width: 24px;
+    height: 24px;
+    fill: #a79d9e;
+    transition: 0.3s ease-in-out;
+  }
+
+  .room-content {
+    width: 100%;
+  }
+
+  .comments {
+    width: 100%;
+    margin: 96px 0 104px 0;
   }
 }
 
-@media screen and (max-width: 900px)  {
-  .container {
-    padding: 24px;
-  }
+.team-join {
+  display: flex;
+  align-items: center;
 }
 
-.flex-item {
-  padding: 0 16px;
+.team-join .team-join-text {
+  margin-left: 80px;
+  width: 376px;
 }
+
+.team-join .team-join-text h2 {
+  margin: 0 0 4px 0;
+}
+
+.team-join .team-join-text p {
+  margin: 0;
+  color: white;
+}
+
+.team-join .team-join-text span {
+  color: #F54B2A;
+  font-weight: bold;
+}
+
+.join-button {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  height: 48px;
+  background: transparent;
+  margin-left: 32px;
+  border-width: 2px;
+  border-style: solid;
+  cursor: pointer;
+}
+
+.join-button:disabled, .join-button:disabled:hover, .join-button:disabled:active {
+  color: #373030 !important;
+  background: transparent !important;
+  border-color: #373030 !important;
+  cursor: not-allowed;
+}
+
+.join-button:disabled .join-team-cta:after,
+.join-button:disabled:hover .join-team-cta:after,
+.join-button:disabled:active .join-team-cta:after {
+  border-right-color: #373030 !important;
+}
+
+.join-button:hover, .join-button:active {
+  color: white !important;
+}
+
+.join-button.team-1 {
+  border-color: #D62546;
+  color: #D62546;
+}
+
+.join-button.team-1:hover {
+  background: #D62546;
+}
+
+.join-button.team-1:active {
+  border-color: #A91A35;
+  background: #A91A35;
+}
+
+.join-button.team-2 {
+  border-color: #45B169;
+  color: #45B169;
+}
+
+.join-button.team-2:hover {
+  background: #45B169;
+}
+
+.join-button.team-2:active {
+  border-color: #379B58;
+  background: #379B58;
+}
+
+.join-team-cta {
+  max-width: 272px;
+  margin: 0 24px;
+  height: 24px;
+  line-height: 24px;
+  position: relative;
+  pointer-events: none;
+}
+
+.join-team-cta:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: -24px;
+  border-right-width: 2px;
+  border-right-style: solid;
+}
+
+.join-button:hover .join-team-cta:after {
+  border-right-color: white !important;
+}
+
+.join-button.team-1 .join-team-cta:after{
+  border-right-color: #D62546;
+}
+
+.join-button.team-2 .join-team-cta:after{
+  border-right-color: #45B169;
+}
+
+.join-team-count {
+  max-width: 136px;
+  margin: 0 16px;
+  font-weight: bold;
+}
+
+.join-team-name {
+  font-weight: bold;
+}
+
+.edit-room-dropdown {
+  position: absolute;
+  top: 72px;
+  right: 0;
+  color: white;
+  background: #111520;
+  padding: 8px 0;
+}
+
+.edit-room-dropdown .dropdown-menu-item {
+  padding: 0 24px;
+  line-height: 40px;
+  cursor: pointer;
+}
+
+.edit-room-dropdown .dropdown-menu-item:hover {
+  background: #F54B2A;
+  color: white;
+}
+
+.edit-room-dropdown .dropdown-menu-item:active {
+  background: #C93D22;
+  color: white;
+}
+
+.edit-room-dropdown .dropdown-menu-item.delete-room {
+  color: #D62546;
+}
+
+.edit-room-dropdown .dropdown-menu-item.delete-room:hover {
+  color: white;
+  background: #D62546;
+}
+
+.edit-room-dropdown .dropdown-menu-item.delete-room:active {
+  background: #A91A35;
+}
+
+.room-header-item {
+  border: solid #333841 1px;
+}
+
+
 
 .form-label {
   color: white;
@@ -92,7 +581,7 @@ h1 {
 
 .comment {
   margin: 8px 0 8px 16px;
-  max-width: 488px;
+  max-width: 784px;
   padding: 16px 24px;
   position: relative;
 }
@@ -103,10 +592,15 @@ h1 {
 
 .comment.team-2 {
   background: #45B169;
+  margin-left: auto;
+  margin-right: 16px;
 }
 
 .comment .comment-body {
   color: white;
+  margin-right: 64px;
+  overflow: auto;
+  word-wrap: break-word;
 }
 
 .comment .comment-created {
@@ -115,6 +609,7 @@ h1 {
   position: absolute;
   bottom: 8px;
   right: 8px;
+  margin-top: 4px;
 }
 
 .header-username {
