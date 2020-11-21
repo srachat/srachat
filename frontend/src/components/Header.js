@@ -21,6 +21,7 @@ class Header extends Component {
         this.updateUrlCallback = updateUrlCallback;
         this.updateAuthCallback = updateAuthCallback;
         this.isAuth = isAuth;
+        this.state = { isRoomZone: true }
     }
 
     componentDidMount() {
@@ -30,22 +31,52 @@ class Header extends Component {
         }
     }
 
+    checkIsActive(number) {
+        return window.location.pathname + window.location.search === HEADER_ROUTES[number].url ? "active" : ""
+    }
+
     render() {
        return (
             <div className="header">
-                <Logo />
-                {
-                    HEADER_ROUTES.map(
-                        headerRoute =>
+                <div className="container">
+                    <div className="logo" onClick={() => this.setState({isRoomZone: true})}>
+                        <Logo />
+                    </div>
+                    <div className="participation-section">
+                        <div className="rooms-section">
                             <Link
-                                to={headerRoute.url}
-                                onClick={() => this.updateUrlCallback(headerRoute.url)}
+                                className={`participation-item ${this.checkIsActive(0)}`}
+                                to={HEADER_ROUTES[0].url}
+                                onClick={() => {
+                                    this.setState(({isRoomZone: true}));
+                                    return this.updateUrlCallback(HEADER_ROUTES[0].url);
+                                }}
                             >
-                                {headerRoute.description}
+                                {HEADER_ROUTES[0].description}
                             </Link>
-                    )
-                }
-                <AuthSection updateAuthCallback={this.updateAuthCallback} />
+                            <Link
+                                className={`participation-item ${this.checkIsActive(1)}`}
+                                to={HEADER_ROUTES[1].url}
+                                onClick={() => {
+                                    this.setState(({isRoomZone: true}));
+                                    return this.updateUrlCallback(HEADER_ROUTES[1].url);
+                                }}
+                            >
+                                {HEADER_ROUTES[1].description}
+                            </Link>
+                        </div>
+                        <Link
+                            className="participation-item create-room"
+                            to={HEADER_ROUTES[2].url}
+                            onClick={() => this.updateUrlCallback(HEADER_ROUTES[2].url)}
+                        >
+                            {HEADER_ROUTES[2].description}
+                        </Link>
+                    </div>
+                    <div className="auth-section">
+                        <AuthSection updateAuthCallback={this.updateAuthCallback} />
+                    </div>
+                </div>
             </div>
         );
     }
@@ -63,13 +94,13 @@ const AuthSection = ({ updateAuthCallback }) => {
     return (
         tokenCookie ? (
             <div className="authorized">
-                <Link to="/" onClick={() => logOut(updateAuthCallback)}>Sign out</Link>
                 <span className="header-username">{username}</span>
+                <Link to="/" onClick={() => logOut(updateAuthCallback)}>Sign out</Link>
             </div>
         ) : (
             <div className="unauthorized">
-                <Link to="/sign-in/">Sign In</Link>
-                <Link to="/sign-up/">Sign Up</Link>
+                <Link to="/sign-in/" className="unauthorized-item sign-in">Sign In</Link>
+                <Link to="/sign-up/" className="unauthorized-item sign-up">Sign Up</Link>
             </div>
         )
     );
