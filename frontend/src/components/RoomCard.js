@@ -25,13 +25,11 @@ const RoomCardInfo = ({title, tags}) => {
 
 const RoomCard = ({id, title, tags, imgUrl}) => {
     return (
-        <div className="flex-item">
-            <div className="room-card">
-                <Link to={`/rooms/${id}`} >
-                    <RoomCardImage url={imgUrl} />
-                    <RoomCardInfo title={title} tags={tags} />
-                </Link>
-            </div>
+        <div className="room-card">
+            <Link to={`/rooms/${id}`} >
+                <RoomCardImage url={imgUrl} />
+                <RoomCardInfo title={title} tags={tags} />
+            </Link>
         </div>
     );
 }

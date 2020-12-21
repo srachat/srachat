@@ -538,6 +538,7 @@ h2 {
   color: white;
   background: #111520;
   padding: 8px 0;
+  z-index: 999;
 }
 
 .edit-room-dropdown .dropdown-menu-item {
@@ -572,8 +573,6 @@ h2 {
 .room-header-item {
   border: solid #333841 1px;
 }
-
-
 
 .form-label {
   color: white;

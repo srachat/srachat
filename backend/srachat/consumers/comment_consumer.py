@@ -1,4 +1,5 @@
 import json
+import logging
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
@@ -11,7 +12,7 @@ from srachat.models.user import Participation
 from srachat.serializers.comment_serializer import BoundRoomCommentSerializer
 
 
-class RoomConsumer(WebsocketConsumer):
+class CommentConsumer(WebsocketConsumer):
     def __init__(self, *args, **kwargs):
         self.room_id = None
         self.chat_user_id = None
@@ -40,6 +41,7 @@ class RoomConsumer(WebsocketConsumer):
         room = Room.objects.get(id=self.room_id)
         self.serializer = BoundRoomCommentSerializer(room)
         self.send(text_data=json.dumps({
+            'type': 'new_message',
             'comments': self.serializer(room.comments.all(), many=True).data
         }))
 
@@ -74,8 +76,10 @@ class RoomConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
-        comment_body = text_data_json['body']
+        if text_data_json.get("type") == "new_message":
+            self.handle_new_message(text_data_json['body'])
 
+    def handle_new_message(self, comment_body: str):
         if not self.is_authenticated:
             self.send_error("Only authenticated users can send messages")
             return
@@ -108,7 +112,7 @@ class RoomConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
-                'type': 'chat_message',
+                'type': 'new_message',
                 'comment': comment
             }
         )
@@ -120,11 +124,11 @@ class RoomConsumer(WebsocketConsumer):
         }))
 
     # Receive message from room group
-    def chat_message(self, event):
+    def new_message(self, event):
         comment = event['comment']
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
-            "type": "chat_message",
+            "type": "new_message",
             "comments": [comment]
         }))

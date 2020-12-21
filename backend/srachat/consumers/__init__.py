@@ -1,1 +1,1 @@
-from .room_consumer import RoomConsumer
+from .comment_consumer import CommentConsumer
