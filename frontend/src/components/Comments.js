@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {CommentMenu, DummyMenu} from "./Dropdown";
+import {CommentMenu} from "./Dropdown";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
 class Comments extends Component {
