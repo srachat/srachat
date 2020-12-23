@@ -1,12 +1,9 @@
 import React, {Component} from "react";
 import {CommentMenu} from "./Dropdown";
-import ReconnectingWebSocket from "reconnecting-websocket";
 
 class Comments extends Component {
     constructor(props) {
         super(props);
-
-        this.props = props;
 
         this.roomUrl = props.roomUrl;
         this.state = {
@@ -14,59 +11,40 @@ class Comments extends Component {
             isParticipant: false,
             websocket: undefined,
             selectedMessagesIds: [],
+            selectedMessagesToDelete: [],
             dropDown: { x: 0, y: 0 }
         }
 
-        this.constructWebSocket = this.constructWebSocket.bind(this);
-		this.submitMessage = this.submitMessage.bind(this);
 		this.addToSelectedMessages = this.addToSelectedMessages.bind(this);
 		this.removeFromSelectedMessaged = this.removeFromSelectedMessaged.bind(this);
 		this.setDropDownCoord = this.setDropDownCoord.bind(this);
+		this.deleteComments = this.deleteComments.bind(this);
+		this.deleteCommentsCallback = this.deleteCommentsCallback.bind(this);
+    }
+
+    componentDidUpdate(prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS) {
+        if (prevProps.comments !== this.props.comments) {
+            this.setState({ comments: this.props.comments })
+        }
+        if (prevProps.websocket !== this.props.websocket) {
+            this.setState({ websocket: this.props.websocket })
+        }
     }
 
     setParticipation(isParticipant) {
         this.setState({ isParticipant: isParticipant });
     }
 
-    componentDidMount() {
-        if (this.state.websocket === undefined) {
-            this.setState({
-                websocket: this.constructWebSocket()
-            });
-        }
-	}
-
     componentWillUnmount() {
         this.state.websocket && this.state.websocket.close();
         this.setState({ websocket: undefined });
     }
 
-    constructWebSocket(loadMessagesOnConnect:boolean=true) {
-        const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
-        const ws = new ReconnectingWebSocket(`${ws_scheme}://${window.location.host}/ws${this.roomUrl}comments/`);
-        ws.onopen = () => { console.log("Parsing messages") }
-        ws.onmessage = event => {
-            const data = JSON.parse(event.data);
-            if (data.type === "error") {
-                alert(data.error_message)
-            } else if (data.type === "new_message") {
-                if (loadMessagesOnConnect) {
-                    this.setState({ comments: this.state.comments.concat(data.comments) });
-                }
-                window.scrollTo(0, document.querySelector(".comments")?.scrollHeight);
-            }
-        }
-        ws.onerror = error => { console.log(error) }
-        ws.onclose = () => { console.log("Disconnected") }
-        return ws;
-    }
-
-    submitMessage(body) {
-        this.state.websocket.send(JSON.stringify({"type": "new_message", "body": body}));
-    }
-
     addToSelectedMessages(id) {
         this.setState({ selectedMessagesIds: this.state.selectedMessagesIds.concat(id) });
+        // +1 since this step somehow does not update the this.state.selectedMessagesIds immediately
+        // some callback magic probably
+        this.setState({ isManySelected: this.state.selectedMessagesIds.length + 1 > 1 });
     }
 
     removeFromSelectedMessaged(id) {
@@ -79,10 +57,35 @@ class Comments extends Component {
         this.setState({ dropDown: coords });
     }
 
+    deleteComments() {
+        this.state.websocket.send(JSON.stringify({
+            "type": "delete_messages",
+            "data": {"ids": this.state.selectedMessagesIds}
+        }));
+        this.setState({ selectedMessagesToDelete: this.state.selectedMessagesIds })
+    }
+
+    deleteCommentsCallback() {
+        this.setState({
+            comments: this.state.comments.filter(
+                comment => !this.state.selectedMessagesToDelete.includes(comment.id)
+            )
+        });
+        this.setState({ selectedMessagesToDelete: [] });
+    }
+
     render() {
         return (
             <div className="comments">
-                {this.state.selectedMessagesIds?.length !== 0 && <CommentMenu coords={this.state.dropDown} />}
+                {
+                    this.state.selectedMessagesIds?.length !== 0 &&
+                    <CommentMenu
+                        coords={this.state.dropDown}
+                        actions={{
+                            deleteComments: this.deleteComments
+                        }}
+                    />
+                }
                 {this.state.comments.map(comment =>
                     <Comment
                         key={comment.id}

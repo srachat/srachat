@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import {Bomb, SettingsIcon} from "./Icons";
 import {DummyMenu, RoomDropdownMenu} from "./Dropdown";
 import Comments from "./Comments";
+import ReconnectingWebSocket from "reconnecting-websocket";
 
 
 class Room extends Component {
@@ -32,6 +33,8 @@ class Room extends Component {
 		this.showMenu = this.showMenu.bind(this);
 		this.closeMenu = this.closeMenu.bind(this);
 		this.submitMessage = this.submitMessage.bind(this);
+        this.constructWebSocket = this.constructWebSocket.bind(this);
+		this.deleteCommentsCallback = this.deleteCommentsCallback.bind(this);
 	}
 
     fetchUsers() {
@@ -63,7 +66,34 @@ class Room extends Component {
                 return this.fetchUsers();
             })
             .catch(err => console.log(err));
+        if (this.state.websocket === undefined) {
+            this.setState({
+                websocket: this.constructWebSocket()
+            });
+        }
 	}
+
+    constructWebSocket(loadMessagesOnConnect:boolean=true) {
+        const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const ws = new ReconnectingWebSocket(`${ws_scheme}://${window.location.host}/ws${this.roomUrl}`);
+        ws.onopen = () => { console.log("Parsing messages") }
+        ws.onmessage = event => {
+            const data = JSON.parse(event.data);
+            if (data.type === "error") {
+                alert(data.error_message)
+            } else if (data.type === "new_message") {
+                if (loadMessagesOnConnect) {
+                    this.setState({ comments: this.state.comments.concat(data.comments) });
+                }
+                window.scrollTo(0, document.querySelector(".comments")?.scrollHeight);
+            } else if (data.type === "delete_messages") {
+                this.deleteCommentsCallback();
+            }
+        }
+        ws.onerror = error => { console.log(error) }
+        ws.onclose = () => { console.log("Disconnected") }
+        return ws;
+    }
 
 	deleteRoom() {
         axios
@@ -77,7 +107,10 @@ class Room extends Component {
         const teamNumber = parseInt(event.target.id);
         axios
             .post(`${this.roomUrl}users/`, {"team_number": teamNumber})
-            .then(() => this.fetchUsers())
+            .then(() => {
+                this.state.websocket.send(JSON.stringify({"type": "join_team"}));
+                return this.fetchUsers();
+            })
             .catch(err => console.log(err));
     }
 
@@ -87,6 +120,7 @@ class Room extends Component {
             .delete(`${this.roomUrl}users/`)
             .then(() => this.fetchUsers())
             .catch(err => console.log(err));
+        this.state.websocket.send(JSON.stringify({"type": "leave_team"}));
     }
 
     getCorrectRoomMenu() {
@@ -123,7 +157,11 @@ class Room extends Component {
         event.preventDefault();
         const body = new FormData(event.target).get("body");
         event.target.reset();
-        this.commentsRef.current.submitMessage(body);
+        this.state.websocket.send(JSON.stringify({"type": "new_message", "data": {"body": body}}));
+    }
+
+    deleteCommentsCallback() {
+        this.commentsRef.current.deleteCommentsCallback();
     }
 
 	render() {
@@ -164,7 +202,7 @@ class Room extends Component {
                     </div>
                     {this.state.showDropdown && this.getCorrectRoomMenu()}
                 </div>
-                <Comments roomUrl={this.roomUrl} ref={this.commentsRef} />
+                <Comments comments={this.state.comments} roomUrl={this.roomUrl} websocket={this.state.websocket} ref={this.commentsRef}/>
             {/*  TODO: Extract the footer into the separate component  */}
                 {Cookies.get("token") &&
                 <div className="room-footer">

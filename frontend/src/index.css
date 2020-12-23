@@ -250,7 +250,7 @@ h2 {
     width: 1760px;
     margin: 0 auto;
     height: 80px;
-    z-index: 999;
+    z-index: 990;
     display: flex;
   }
 
@@ -557,16 +557,16 @@ h2 {
   color: white;
 }
 
-.edit-room-dropdown .dropdown-menu-item.delete-room {
+.dropdown-menu-item.delete {
   color: #D62546;
 }
 
-.edit-room-dropdown .dropdown-menu-item.delete-room:hover {
+.dropdown-menu-item.delete:hover {
   color: white;
   background: #D62546;
 }
 
-.edit-room-dropdown .dropdown-menu-item.delete-room:active {
+.dropdown-menu-item.delete:active {
   background: #A91A35;
 }
 
@@ -580,7 +580,7 @@ h2 {
 
 .comment {
   margin: 8px 0 8px 16px;
-  max-width: 784px;
+  max-width: fit-content;
   padding: 16px 24px;
   position: relative;
 }
@@ -591,8 +591,7 @@ h2 {
 
 .comment.team-2 {
   background: #45B169;
-  margin-left: auto;
-  margin-right: 16px;
+  margin-left: 64px;
 }
 
 .comment .comment-body {

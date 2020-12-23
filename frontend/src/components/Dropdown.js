@@ -20,12 +20,12 @@ const DropdownMenu = ({options, name, coords}) => {
 export const RoomDropdownMenu = ({isParticipant, isCreator, actions}) => {
     const options = [];
     isParticipant && options.push(...[
-                {name: "Leave the room", action: actions.leaveRoomAction, className: "leave-the-room"}
+                {name: "Leave the team", action: actions.leaveRoomAction, className: "leave-the-room"}
             ])
     isCreator && options.push(...[
                 {name: "Ban user", action: actions.banUserAction, className: "ban-user"},
                 {name: "Change room info", action: actions.changeRoomAction, className: "change-room-info"},
-                {name: "Delete room", action: actions.deleteRoomAction, className: "delete-room"},
+                {name: "Delete room", action: actions.deleteRoomAction, className: "delete-room delete"},
             ])
 
     return (
@@ -48,12 +48,13 @@ export const DummyMenu = () => {
     )
 }
 
-export const CommentMenu = ({coords}) => {
+export const CommentMenu = ({coords, actions}) => {
+    const options = [
+        {name: "Delete", action: actions.deleteComments, className: "delete-comment delete"},
+    ]
     return (
         <DropdownMenu
-            options={[
-                {name: "No menu", action: () => alert("I told you that there is no menu!"), className: "no-menu"}
-            ]}
+            options={options}
             name="edit-room-dropdown"
             coords={coords}
         />

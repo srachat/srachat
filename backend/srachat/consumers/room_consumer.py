@@ -1,18 +1,18 @@
 import json
-import logging
+from typing import Dict
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.contrib.auth.models import AnonymousUser, User
 from rest_framework.exceptions import ValidationError
 
-from srachat.models import ChatUser
+from srachat.models import ChatUser, Comment
 from srachat.models.room import Room
 from srachat.models.user import Participation
 from srachat.serializers.comment_serializer import BoundRoomCommentSerializer
 
 
-class CommentConsumer(WebsocketConsumer):
+class RoomConsumer(WebsocketConsumer):
     def __init__(self, *args, **kwargs):
         self.room_id = None
         self.chat_user_id = None
@@ -76,10 +76,18 @@ class CommentConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
-        if text_data_json.get("type") == "new_message":
-            self.handle_new_message(text_data_json['body'])
+        data_type = text_data_json.get("type")
+        data = text_data_json.get("data")
+        if data_type == "new_message":
+            self.handle_new_message(data)
+        elif data_type == "delete_messages":
+            self.handle_delete_messages(data)
+        elif data_type == "join_team":
+            self.handle_join_team()
+        elif data_type == "leave_team":
+            self.handle_leave_team()
 
-    def handle_new_message(self, comment_body: str):
+    def handle_new_message(self, data: Dict[str, str]):
         if not self.is_authenticated:
             self.send_error("Only authenticated users can send messages")
             return
@@ -92,12 +100,17 @@ class CommentConsumer(WebsocketConsumer):
             self.send_error("You are not a participant of any room's team")
             return
 
-        data = {
-            "body": comment_body,
+        body = data.get("body")
+        if not body:
+            self.send_error("Empty message body was sent")
+            return
+
+        comment_data = {
+            "body": body,
             "creator": self.chat_user_id,
             "team_number": self.user_team_number
         }
-        serializer = self.serializer(data=data)
+        serializer = self.serializer(data=comment_data)
         try:
             serializer.is_valid(raise_exception=True)
         except ValidationError as e:
@@ -116,6 +129,43 @@ class CommentConsumer(WebsocketConsumer):
                 'comment': comment
             }
         )
+
+    def handle_delete_messages(self, data: Dict[str, str]):
+        comment_ids = data.get("ids")
+        if not comment_ids:
+            self.send_error("No messages were specified for deletion.")
+            return
+        if not isinstance(comment_ids, list):
+            self.send_error("Comments ids must be an array of ints.")
+            return
+
+        comments = Comment.objects.filter(pk__in=comment_ids)
+        if not comments.exists():
+            self.send_error("Comments with such ids don't exist.")
+            return
+        is_creator = all(comment.creator.id == self.user.id for comment in comments)
+        if not is_creator:
+            self.send_error("You should be a creator of all selected messages to delete them")
+            return
+        comments.delete()
+        self.send(text_data=json.dumps({
+            "type": "delete_messages",
+        }))
+
+    def handle_leave_team(self):
+        if not self.is_participant:
+            self.send_error("Not a participant")
+        self.is_participant = False
+        self.user_team_number = None
+
+    def handle_join_team(self):
+        if self.is_participant:
+            self.send_error("Already a participant")
+
+        participation = Participation.objects.filter(chatuser__id=self.chat_user_id, room__id=self.room_id)
+        if participation.exists():
+            self.is_participant = True
+            self.user_team_number = participation.first().team_number
 
     def send_error(self, error_message):
         self.send(text_data=json.dumps({
