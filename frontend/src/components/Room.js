@@ -1,10 +1,10 @@
 import React, {Component} from "react";
 import axios from "axios";
-import Comment from "./Comments";
 import Cookies from "js-cookie";
-import ReconnectingWebSocket from "reconnecting-websocket";
 import {Bomb, SettingsIcon} from "./Icons";
-import {DummyMenu, EditRoomDropdownMenu, ParticipantDropdownMenu} from "./Dropdown";
+import {DummyMenu, RoomDropdownMenu} from "./Dropdown";
+import Comments from "./Comments";
+import ReconnectingWebSocket from "reconnecting-websocket";
 
 
 class Room extends Component {
@@ -19,70 +19,43 @@ class Room extends Component {
             firstRoomParticipants: 0, secondRoomParticipants: 0,
             firstRoomFilled: false, secondRoomFilled: false,
             websocket: undefined,
-            roomMenuOpen: false
+            showDropdown: false
         };
 		this.currentUserId = parseInt(JSON.parse(localStorage.getItem("userdata"))?.userId) || -1;
+
+		this.commentsRef = React.createRef();
 
 		this.deleteRoom = this.deleteRoom.bind(this);
 		this.fetchUsers = this.fetchUsers.bind(this);
 		this.joinTeam = this.joinTeam.bind(this);
 		this.leaveTeam = this.leaveTeam.bind(this);
-		this.submitMessage = this.submitMessage.bind(this);
-		this.updateCreator = this.updateCreator.bind(this);
 		this.updateParticipation = this.updateParticipation.bind(this);
+		this.showMenu = this.showMenu.bind(this);
+		this.closeMenu = this.closeMenu.bind(this);
+		this.submitMessage = this.submitMessage.bind(this);
+        this.constructWebSocket = this.constructWebSocket.bind(this);
+		this.deleteCommentsCallback = this.deleteCommentsCallback.bind(this);
 	}
-
-    constructWebSocket(loadMessagesOnConnect:boolean=true) {
-        // This is WIP
-        // Next patches will bring room join, comment deletion/update,
-        // subchat separation, viewer count
-        const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
-        const ws = new ReconnectingWebSocket(`${ws_scheme}://${window.location.host}/ws${this.roomUrl}`);
-        ws.onopen = () => { console.log("Successfully joined the room :)") }
-        ws.onmessage = event => {
-            const data = JSON.parse(event.data);
-            if (data.type === "error") {
-                alert(data.error_message)
-            } else {
-                if (loadMessagesOnConnect) {
-                    this.setState({ comments: this.state.comments.concat(data.comments) });
-                }
-                window.scrollTo(0, document.querySelector(".comments").scrollHeight);
-            }
-        }
-        ws.onerror = error => { console.log(error) }
-        ws.onclose = () => { console.log("Disconnected") }
-        return ws;
-    }
-
-	updateCreator() {
-        this.setState({
-                userState: {
-                    isCreator: this.currentUserId === this.state.creator,
-                    isParticipant: this.state.userState.isParticipant
-                }
-            })
-    }
 
     fetchUsers() {
         return axios
             .get(`${this.roomUrl}users/`)
             .then(res => this.updateParticipation(res.data))
-            .catch(err => console.log(err.response.statusText))
+            .catch(err => console.log(err))
     }
 
     updateParticipation(participantIds) {
         const allParticipants = Object.values(participantIds).flat();
         this.setState({
             userState: {
-                isCreator: this.state.userState.isCreator,
+                isCreator: this.currentUserId === this.state.creator,
                 isParticipant: allParticipants.includes(this.currentUserId)
             },
             firstRoomFilled: participantIds["1"].length >= this.state.max_participants_in_team,
             secondRoomFilled: participantIds["2"].length >= this.state.max_participants_in_team,
             firstRoomParticipants: participantIds["1"].length,
             secondRoomParticipants: participantIds["2"].length
-        })
+        });
     }
 
     componentDidMount() {
@@ -90,16 +63,36 @@ class Room extends Component {
             .get(this.roomUrl)
             .then(res => {
                 this.setState(res.data);
-                this.updateCreator();
                 return this.fetchUsers();
             })
-            .catch(err => this.props.history.push("/404"));
-        this.setState({websocket: this.constructWebSocket()});
+            .catch(err => console.log(err));
+        if (this.state.websocket === undefined) {
+            this.setState({
+                websocket: this.constructWebSocket()
+            });
+        }
 	}
 
-    componentWillUnmount() {
-        this.state.websocket && this.state.websocket.close();
-        this.setState({ websocket: undefined });
+    constructWebSocket(loadMessagesOnConnect:boolean=true) {
+        const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const ws = new ReconnectingWebSocket(`${ws_scheme}://${window.location.host}/ws${this.roomUrl}`);
+        ws.onopen = () => { console.log("Parsing messages") }
+        ws.onmessage = event => {
+            const data = JSON.parse(event.data);
+            if (data.type === "error") {
+                alert(data.error_message)
+            } else if (data.type === "new_message") {
+                if (loadMessagesOnConnect) {
+                    this.setState({ comments: this.state.comments.concat(data.comments) });
+                }
+                window.scrollTo(0, document.querySelector(".comments")?.scrollHeight);
+            } else if (data.type === "delete_messages") {
+                this.deleteCommentsCallback();
+            }
+        }
+        ws.onerror = error => { console.log(error) }
+        ws.onclose = () => { console.log("Disconnected") }
+        return ws;
     }
 
 	deleteRoom() {
@@ -109,19 +102,15 @@ class Room extends Component {
             .catch(err => console.log(err.response.statusText));
     }
 
-    submitMessage(event) {
-        event.preventDefault();
-        const body = new FormData(event.target).get("body");
-        event.target.reset();
-        this.state.websocket.send(JSON.stringify({"body": body}));
-    }
-
     joinTeam(event) {
         event.preventDefault();
         const teamNumber = parseInt(event.target.id);
         axios
             .post(`${this.roomUrl}users/`, {"team_number": teamNumber})
-            .then(() => this.fetchUsers())
+            .then(() => {
+                this.state.websocket.send(JSON.stringify({"type": "join_team"}));
+                return this.fetchUsers();
+            })
             .catch(err => console.log(err));
     }
 
@@ -131,16 +120,48 @@ class Room extends Component {
             .delete(`${this.roomUrl}users/`)
             .then(() => this.fetchUsers())
             .catch(err => console.log(err));
+        this.state.websocket.send(JSON.stringify({"type": "leave_team"}));
     }
 
-    getCorrectMenu() {
-        if (this.state.userState.isCreator) {
-            return <EditRoomDropdownMenu deleteRoomAction={this.deleteRoom} />;
-        } else if (this.state.userState.isParticipant) {
-            return <ParticipantDropdownMenu leaveRoomAction={this.leaveTeam} />
+    getCorrectRoomMenu() {
+        if (this.state.userState.isCreator || this.state.userState.isParticipant) {
+            return <RoomDropdownMenu
+                isParticipant={this.state.userState.isParticipant}
+                isCreator={this.state.userState.isCreator}
+                actions={{
+                    deleteRoomAction: this.deleteRoom,
+                    leaveRoomAction: this.leaveTeam
+                }}
+                />
         } else {
             return <DummyMenu />;
         }
+    }
+
+    showMenu(event) {
+        event.preventDefault();
+
+        this.setState({ showDropdown: !this.state.showDropdown }, () => {
+            document.addEventListener('click', this.closeMenu);
+            event.stopPropagation();
+        });
+    }
+
+    closeMenu(event) {
+        this.setState({ showDropdown: false }, () => {
+            document.removeEventListener('click', this.closeMenu);
+        });
+    }
+
+    submitMessage(event) {
+        event.preventDefault();
+        const body = new FormData(event.target).get("body");
+        event.target.reset();
+        this.state.websocket.send(JSON.stringify({"type": "new_message", "data": {"body": body}}));
+    }
+
+    deleteCommentsCallback() {
+        this.commentsRef.current.deleteCommentsCallback();
     }
 
 	render() {
@@ -174,20 +195,18 @@ class Room extends Component {
                         </div>
                     </div>
                     <div
-                        className={`room-settings room-header-item ${this.state.roomMenuOpen ? "open" : ""}`}
-                        onClick={() => { this.setState({roomMenuOpen: !this.state.roomMenuOpen}) }}
+                        className={`room-settings room-header-item ${this.state.showDropdown ? "open" : ""}`}
+                        onClick={this.showMenu}
                     >
                         <SettingsIcon />
                     </div>
-                    {this.state.roomMenuOpen && this.getCorrectMenu()}
+                    {this.state.showDropdown && this.getCorrectRoomMenu()}
                 </div>
-                <div className="comments">
-                    {this.state.comments.map(comment => <Comment key={comment.id} {...comment} />)}
-                </div>
+                <Comments comments={this.state.comments} roomUrl={this.roomUrl} websocket={this.state.websocket} ref={this.commentsRef}/>
             {/*  TODO: Extract the footer into the separate component  */}
                 {Cookies.get("token") &&
                 <div className="room-footer">
-                    {this.state.userState.isParticipant ? (
+                    { this.state.userState.isParticipant ? (
                         <form onSubmit={this.submitMessage} className="message" autoComplete="off">
                             <input name="body" placeholder="Tell them your opinion" required={true} className="send-message-text"/>
                             <button value="Send message" className="send-message-button">
