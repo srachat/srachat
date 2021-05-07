@@ -23,17 +23,17 @@ from rest_framework.schemas import get_schema_view
 from . import settings
 from .views import HealthCheck, index
 
-SCHEMA_NAME = "pidorapi-schema"
+SCHEMA_NAME = "api-schema"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('pidor/', include('srachat.urls')),  # route to api calls
+    path('api/', include('srachat.urls')),  # route to api calls
     # Use the `get_schema_view()` helper to add a `SchemaView` to project URLs.
     #   * `title` and `description` parameters are passed to `SchemaGenerator`.
     #   * Provide view name for use with `reverse()`.
-    path('pidorapi/', get_schema_view(
+    path('schema-api/', get_schema_view(
         title="Srachat API Scheme",
-        description="API for all things … and pidors",
+        description="API for all things … and other",
         version="0.0.0"
     ), name=SCHEMA_NAME),
     # Route TemplateView to serve Swagger UI template.
